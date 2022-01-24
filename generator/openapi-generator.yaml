@@ -1,0 +1,11 @@
+moduleName: LinstorClient
+library: faraday
+gemName: ruby-linstor-client
+gemVersion: 1.0.0
+gemAuthor: buty4649
+gemAuthorEmail: buty4649@gmail.com
+gemDescription: Linstor REST API Ruby Gem
+gemSummary: Linstor REST API Ruby Gem
+gemHomepage: https://github.com/buty4649/ruby-linstor-client
+gemLicense: MIT
+gemRequiredRubyVersion: ">= 2.7"
