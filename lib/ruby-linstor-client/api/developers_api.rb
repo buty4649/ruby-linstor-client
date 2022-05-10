@@ -1,9 +1,9 @@
 =begin
 #Linstor REST API
 
-#Linstor REST API V1  The V1 rest api of Linstor should stay compatible and only additions are made to the API, If there are breaking changes or redesigned a new major REST API version will be issued.  Server runs per default on port `3370` on `::` ipv6 and ipv4.  To change the bind address or port you can use the following linstor client commands: ``` linstor controller set-property REST/bindAddress 127.0.0.1 linstor controller set-property REST/port 8080 ```  After setting this properties restart the controller and the new values should be used.  Changelog:  * 1.0.13   - Fixed broken volume definition modify `flags` handling   - Added flags to volume groups (create/modify) * 1.0.12   - Added WritecacheResource and WritecacheVolume schemas.   - Removed support for swordfish   - Added `with_storage_pool` to PhysicalStorageCreate post request, allowing to create linstor storage pools too   - Added `gross` flag for volume-definition size   - Added flags to VolumeDefinitionModify (so that `gross` flag can be changed)   - Added query-max-volume-size to resource-groups * 1.0.11   - Added /v1/physical-storage endpoint, that lets you query and create lvm/zfs pools   - Extended Node with list of supported providers and layers as well as lists of reasons for     unsupported providers and layers * 1.0.10   - Added `reports` array field to Volume object, contains ApiCallRcs for problems   - Changed `ResourceDefinitions` can now include `VolumeDefinitions` in `volume_definitions` field   - Added various filter query parameters * 1.0.9   - Added supports_snapshots to StoragePool * 1.0.8   - Added /v1/resource-groups   - Added /v1/resource-groups/{rscgrp}/volume-groups   - Moved AutoSelectFilter::place_count default indirectly to create resource implementation   - Added diskless_on_remaining to AutoSelectFilter   - Changed /v1/view/resources return type to ResourceWithVolumes     ResourceWithVolumes is now a child type of Resource (removed volumes from Resource) * 1.0.7   - Added ext_meta_stor_pool to DrbdVolume   - Added is_active field to the NetInterface type * 1.0.6   - Added /v1/resource-definitions/{rscName}/resources/{nodeName}/volumes/{vlmnr} PUT * 1.0.5   - Added `reports` field to StoragePool object * 1.0.4   - Added /v1/view/storage-pools overview path   - Added uuid fields for objects * 1.0.3   - Added /v1/view/resources overview path   - documentation schema extraction * 1.0.2   - Added /v1/storage-pool-definitions object path   - added NVME layer object type * 1.0.1   - Documentation review and updates   - no functional changes * 1.0.0   - Initial REST API v1 
+#Linstor REST API V1  The V1 rest api of Linstor should stay compatible and only additions are made to the API, If there are breaking changes or redesigned a new major REST API version will be issued.  Server runs per default on port `3370` on `::` ipv6 and ipv4.  To change the bind address or port you can use the following linstor client commands: ``` linstor controller set-property REST/bindAddress 127.0.0.1 linstor controller set-property REST/port 8080 ```  After setting this properties restart the controller and the new values should be used.  Changelog:  * 1.5.0    - Added etcd.prefix to ControllerConfigDbEtcd parameters * 1.4.0    - Added promotion_score and may_promote to DrbdResource object    - Added /v1/error-reports DELETE method, to delete a range of error reports or single ones    - Added SSE (Server Sent Events) url /v1/events/drbd/promotion * 1.3.0    - Added /v1/view/snapshot-shippings * 1.2.0    - Added optional AutoSelectFilter to resource-group/spawn    - Added /v1/nodes/{node}/config, that allows you to get and set the satellite config    - Added /v1/sos-report to create bug reports you can send to linbit    - Added new fields to the ErrorReport object    - Added /v1/resource-definitions/{resource}/snapshot-shipping    - Allow to modify the resource group in Resource definitions    - Added createTimestamp to Resource and Snapshot    - Added default value (null) for AutoPlaceRequest's layer_list * 1.1.0    - Added /v1/view/snapshots for a faster all in one snapshot list    - Filter lists by properties:       - /v1/nodes       - /v1/resource-definitions       - /v1/resource-groups       - /v1/view/storage-pools       - /v1/view/resources * 1.0.16    - Added CacheResource and CacheVolume schemas    - AutSelectFilter arrays are now null per default * 1.0.15   - Added connections map to the DRBD resource layer data   - Added support for Openflex * 1.0.14   - Added /v1/controller/config, that gives you the controller config information * 1.0.13   - Fixed broken volume definition modify `flags` handling   - Added flags to volume groups (create/modify) * 1.0.12   - Added WritecacheResource and WritecacheVolume schemas.   - Removed support for swordfish   - Added `with_storage_pool` to PhysicalStorageCreate post request, allowing to create linstor storage pools too   - Added `gross` flag for volume-definition size   - Added flags to VolumeDefinitionModify (so that `gross` flag can be changed)   - Added query-max-volume-size to resource-groups * 1.0.11   - Added /v1/physical-storage endpoint, that lets you query and create lvm/zfs pools   - Extended Node with list of supported providers and layers as well as lists of reasons for     unsupported providers and layers * 1.0.10   - Added `reports` array field to Volume object, contains ApiCallRcs for problems   - Changed `ResourceDefinitions` can now include `VolumeDefinitions` in `volume_definitions` field   - Added various filter query parameters * 1.0.9   - Added supports_snapshots to StoragePool * 1.0.8   - Added /v1/resource-groups   - Added /v1/resource-groups/{rscgrp}/volume-groups   - Moved AutoSelectFilter::place_count default indirectly to create resource implementation   - Added diskless_on_remaining to AutoSelectFilter   - Changed /v1/view/resources return type to ResourceWithVolumes     ResourceWithVolumes is now a child type of Resource (removed volumes from Resource) * 1.0.7   - Added ext_meta_stor_pool to DrbdVolume   - Added is_active field to the NetInterface type * 1.0.6   - Added /v1/resource-definitions/{rscName}/resources/{nodeName}/volumes/{vlmnr} PUT * 1.0.5   - Added `reports` field to StoragePool object * 1.0.4   - Added /v1/view/storage-pools overview path   - Added uuid fields for objects * 1.0.3   - Added /v1/view/resources overview path   - documentation schema extraction * 1.0.2   - Added /v1/storage-pool-definitions object path   - added NVME layer object type * 1.0.1   - Documentation review and updates   - no functional changes * 1.0.0   - Initial REST API v1 
 
-The version of the OpenAPI document: 1.0.13
+The version of the OpenAPI document: 1.5.0
 Contact: rene.peinthor@linbit.com
 Generated by: https://openapi-generator.tech
 OpenAPI Generator version: 5.3.1
@@ -19,6 +19,63 @@ module LinstorClient
     def initialize(api_client = ApiClient.default)
       @api_client = api_client
     end
+    # show controller config
+    # Show Controller config 
+    # @param [Hash] opts the optional parameters
+    # @return [ControllerConfig]
+    def controller_config(opts = {})
+      data, _status_code, _headers = controller_config_with_http_info(opts)
+      data
+    end
+
+    # show controller config
+    # Show Controller config 
+    # @param [Hash] opts the optional parameters
+    # @return [Array<(ControllerConfig, Integer, Hash)>] ControllerConfig data, response status code and response headers
+    def controller_config_with_http_info(opts = {})
+      if @api_client.config.debugging
+        @api_client.config.logger.debug 'Calling API: DevelopersApi.controller_config ...'
+      end
+      # resource path
+      local_var_path = '/v1/controller/config'
+
+      # query parameters
+      query_params = opts[:query_params] || {}
+
+      # header parameters
+      header_params = opts[:header_params] || {}
+      # HTTP header 'Accept' (if needed)
+      header_params['Accept'] = @api_client.select_header_accept(['application/json'])
+
+      # form parameters
+      form_params = opts[:form_params] || {}
+
+      # http body (model)
+      post_body = opts[:debug_body]
+
+      # return_type
+      return_type = opts[:debug_return_type] || 'ControllerConfig'
+
+      # auth_names
+      auth_names = opts[:debug_auth_names] || []
+
+      new_options = opts.merge(
+        :operation => :"DevelopersApi.controller_config",
+        :header_params => header_params,
+        :query_params => query_params,
+        :form_params => form_params,
+        :body => post_body,
+        :auth_names => auth_names,
+        :return_type => return_type
+      )
+
+      data, status_code, headers = @api_client.call_api(:GET, local_var_path, new_options)
+      if @api_client.config.debugging
+        @api_client.config.logger.debug "API called: DevelopersApi#controller_config\nData: #{data.inspect}\nStatus code: #{status_code}\nHeaders: #{headers}"
+      end
+      return data, status_code, headers
+    end
+
     # Deletes a controller property
     # Delete a controller property
     # @param key [String] 
@@ -140,7 +197,7 @@ module LinstorClient
     end
 
     # sets or modifies controller properties
-    # Sets or modifies properties  Possible properties are: - `TcpPortAutoRange` - regex[`[0-9]+-[0-9]+`]      Range for auto-allocation of resource TCP ports  - `MinorNrAutoRange` - regex[`[0-9]+-[0-9]+`]      Range for auto-allocation of volume minor numbers  - `PeerSlotsNewResource` - range[`1-31`]      DRBD peer slots to allocate for newly created resources (default 7), the number of peer slots cannot be changed once the resource is created, so allow sufficient slots to increase redundancy in the future  - `StorDriver/DMStats` - boolean_true_false      Enable dmstats on lvm create  - `GlobSeqApiCalls` - boolean_true_false      Globally sequentialize all ctrl -> stlt api calls  - `REST/bindAddress` - string      Bind address of the REST API  - `REST/port` - range[`1-65535`]      TCP Port of the REST API  - `REST/enabled` - boolean_true_false      Bool if REST API should be enabled  - `NVMe/enabled` - enum     * rdma     * tcp  - `NVMe/enabled` - range[`1-65535`] - `NVMe/PrefNic` - regex[`^[a-zA-Z0-9_][a-zA-Z0-9_-]{2,47}$`]      Preferred network interface to use  - `StorDriver/WaitTimeoutAfterCreate` - regex[`[0-9]+`] - `sys/fs/blkio_throttle_read` - long      Sets the /sys/fs/cgroup/blkio/blkio.throttle.read_bps_device  - `sys/fs/blkio_throttle_write` - long      Sets the /sys/fs/cgroup/blkio/blkio.throttle.write_bps_device  - `SearchDomain` - string      Search domain node names, if no FQDN is given.  - `ExtCmdWaitTimeout` - long      Wait timeout for an external command in milliseconds  - `DrbdOptions/auto-quorum` - enum      Enables automatic setting of the 'quroum' and 'on-no-quroum' property      * io-error     * suspend-io     * disabled  - `DrbdOptions/auto-add-quorum-tiebreaker` - boolean_true_false      Enables automatic management (creation and deletion) of tie breaking resource  - `Writecache/PoolName` - regex[`^[a-zA-Z0-9_][a-zA-Z0-9_-]{2,47}$`]      Linstor storage pool name for writecache  - `Writecache/Size` - regex[`^100%|[0-9]{1,2}([.][0-9]*)?%|[1-9][0-9]{2,}$`]      Size of the writecache in % (0-100) or KiB otherwise  - `Writecache/Blocksize` - long      4096 is recommended; the maximum block size is the page size  - `Writecache/Options/StartSector` - long      offset from the start of cache device in 512-byte sectors  - `Writecache/Options/HighWatermark` - long      start writeback when the number of used blocks reach this watermark  - `Writecache/Options/LowWatermark` - long      stop writeback when the number of used blocks drops below this watermark  - `Writecache/Options/WritebackJobs` - long      limit the number of blocks that are in flight during writeback. Setting this value reduces writeback throughput, but it may improve latency of read requests  - `Writecache/Options/AutocommitBlocks` - long      when the application writes this amount of blocks without issuing the FLUSH request, the blocks are automatically commited  - `Writecache/Options/AutocommitTime` - long      autocommit time in milliseconds. The data is automatically commited if this time passes and no FLUSH request is received  - `Writecache/Options/Fua` - enum      \"On\" results in \"fua\" as argument, whereas the value \"Off\" results in \"nofua\" argument      * On     * Off  - `Writecache/Options/Additional` - string      Additional arguments passed through  - `DrbdOptions/Disk/read-balancing` - enum     * prefer-local     * prefer-remote     * round-robin     * least-pending     * when-congested-remote     * 32K-striping     * 64K-striping     * 128K-striping     * 256K-striping     * 512K-striping     * 1M-striping  - `DrbdOptions/Disk/on-io-error` - enum     * pass_on     * call-local-io-error     * detach  - `DrbdOptions/Disk/disk-drain` - boolean - `DrbdOptions/Disk/resync-after` - string - `DrbdOptions/Disk/disk-timeout` - range[`0-6000`] - `DrbdOptions/Disk/disable-write-same` - boolean - `DrbdOptions/Disk/rs-discard-granularity` - range[`0-1048576`] - `DrbdOptions/Disk/disk-flushes` - boolean - `DrbdOptions/Disk/al-extents` - range[`67-65534`] - `DrbdOptions/Disk/al-updates` - boolean - `DrbdOptions/Disk/md-flushes` - boolean - `DrbdOptions/Disk/disk-barrier` - boolean - `DrbdOptions/Disk/discard-zeroes-if-aligned` - boolean - `DrbdOptions/PeerDevice/c-fill-target` - range[`0-1048576`] - `DrbdOptions/PeerDevice/c-max-rate` - range[`250-4194304`] - `DrbdOptions/PeerDevice/resync-rate` - range[`1-8388608`] - `DrbdOptions/PeerDevice/c-delay-target` - range[`1-100`] - `DrbdOptions/PeerDevice/c-min-rate` - range[`0-4194304`] - `DrbdOptions/PeerDevice/bitmap` - boolean - `DrbdOptions/PeerDevice/c-plan-ahead` - range[`0-300`] - `DrbdOptions/Resource/peer-ack-delay` - range[`1-10000`] - `DrbdOptions/Resource/quorum-minimum-redundancy` - enum [`1-32`]     * off     * majority     * all  - `DrbdOptions/Resource/max-io-depth` - range[`4-4294967295`] - `DrbdOptions/Resource/auto-promote-timeout` - range[`0-600`] - `DrbdOptions/Resource/quorum` - enum [`1-32`]     * off     * majority     * all  - `DrbdOptions/Resource/on-no-data-accessible` - enum     * io-error     * suspend-io  - `DrbdOptions/Resource/auto-promote` - boolean - `DrbdOptions/Resource/cpu-mask` - string - `DrbdOptions/Resource/twopc-timeout` - range[`50-600`] - `DrbdOptions/Resource/twopc-retry-timeout` - range[`1-50`] - `DrbdOptions/Resource/peer-ack-window` - range[`2048-204800`] - `DrbdOptions/Resource/on-no-quorum` - enum     * io-error     * suspend-io  - `DrbdOptions/Net/max-epoch-size` - range[`1-20000`] - `DrbdOptions/Net/protocol` - enum     * A     * B     * C  - `DrbdOptions/Net/allow-two-primaries` - boolean - `DrbdOptions/Net/after-sb-0pri` - enum     * disconnect     * discard-younger-primary     * discard-older-primary     * discard-zero-changes     * discard-least-changes     * discard-local     * discard-remote  - `DrbdOptions/Net/ko-count` - range[`0-200`] - `DrbdOptions/Net/data-integrity-alg` - string - `DrbdOptions/Net/ping-timeout` - range[`1-300`] - `DrbdOptions/Net/sndbuf-size` - range[`0-10485760`] - `DrbdOptions/Net/transport` - string - `DrbdOptions/Net/rcvbuf-size` - range[`0-10485760`] - `DrbdOptions/Net/max-buffers` - range[`32-131072`] - `DrbdOptions/Net/fencing` - enum     * dont-care     * resource-only     * resource-and-stonith  - `DrbdOptions/Net/csums-alg` - string - `DrbdOptions/Net/always-asbp` - boolean - `DrbdOptions/Net/congestion-extents` - range[`67-65534`] - `DrbdOptions/Net/on-congestion` - enum     * block     * pull-ahead     * disconnect  - `DrbdOptions/Net/ping-int` - range[`1-120`] - `DrbdOptions/Net/rr-conflict` - enum     * disconnect     * call-pri-lost     * violently  - `DrbdOptions/Net/tcp-cork` - boolean - `DrbdOptions/Net/use-rle` - boolean - `DrbdOptions/Net/csums-after-crash-only` - boolean - `DrbdOptions/Net/socket-check-timeout` - range[`0-300`] - `DrbdOptions/Net/congestion-fill` - range[`0-20971520`] - `DrbdOptions/Net/cram-hmac-alg` - string - `DrbdOptions/Net/verify-alg` - string - `DrbdOptions/Net/shared-secret` - string - `DrbdOptions/Net/connect-int` - range[`1-120`] - `DrbdOptions/Net/timeout` - range[`1-600`] - `DrbdOptions/Net/after-sb-2pri` - enum     * disconnect     * call-pri-lost-after-sb     * violently-as0p  - `DrbdOptions/Net/after-sb-1pri` - enum     * disconnect     * consensus     * discard-secondary     * call-pri-lost-after-sb     * violently-as0p  - `DrbdOptions/Handlers/after-resync-target` - string - `DrbdOptions/Handlers/before-resync-target` - string - `DrbdOptions/Handlers/before-resync-source` - string - `DrbdOptions/Handlers/out-of-sync` - string - `DrbdOptions/Handlers/quorum-lost` - string - `DrbdOptions/Handlers/fence-peer` - string - `DrbdOptions/Handlers/unfence-peer` - string - `DrbdOptions/Handlers/initial-split-brain` - string - `DrbdOptions/Handlers/local-io-error` - string - `DrbdOptions/Handlers/pri-lost` - string - `DrbdOptions/Handlers/pri-lost-after-sb` - string - `DrbdOptions/Handlers/pri-on-incon-degr` - string - `DrbdOptions/Handlers/split-brain` - string 
+    # Sets or modifies properties  Possible properties are: - `TcpPortAutoRange` - regex[`[0-9]+-[0-9]+`]      Range for auto-allocation of resource TCP ports  - `MinorNrAutoRange` - regex[`[0-9]+-[0-9]+`]      Range for auto-allocation of volume minor numbers  - `PeerSlotsNewResource` - range[`1-31`]      DRBD peer slots to allocate for newly created resources (default 7), the number of peer slots cannot be changed once the resource is created, so allow sufficient slots to increase redundancy in the future  - `StorDriver/DMStats` - boolean_true_false      Enable dmstats on lvm create  - `REST/disable-http-metrics` - boolean_true_false      Disable Prometheus /metrics on HTTP, if HTTPS is enabled  - `DrbdOptions/AutoEvictAfterTime` - long      Time a node can be offline before it is declared EVICTED in minutes  - `DrbdOptions/AutoEvictMaxDisconnectedNodes` - range[`0-100`]      Percentage(0-100) of nodes that can disconnect at the same time without the controller stopping the max_offline_time timer  - `DrbdOptions/AutoEvictMinReplicaCount` - long      The minimum amount of replicas that should be present for a resource at all times.  - `NVMe/TRType` - enum      NVMe transportion type      * rdma     * tcp  - `NVMe/Port` - range[`1-65535`]      NVMe port  - `NVMe/PrefNic` - regex[`^[a-zA-Z0-9_][a-zA-Z0-9_-]{2,47}$`]      Preferred network interface to use  - `StorDriver/WaitTimeoutAfterCreate` - regex[`[0-9]+`] - `sys/fs/blkio_throttle_read` - long      Sets the /sys/fs/cgroup/blkio/blkio.throttle.read_bps_device  - `sys/fs/blkio_throttle_write` - long      Sets the /sys/fs/cgroup/blkio/blkio.throttle.write_bps_device  - `sys/fs/blkio_throttle_read_iops` - long      Sets the /sys/fs/cgroup/blkio/blkio.throttle.read_iops_device  - `sys/fs/blkio_throttle_write_iops` - long      Sets the /sys/fs/cgroup/blkio/blkio.throttle.write_iops_device  - `SearchDomain` - string      Search domain node names, if no FQDN is given.  - `ExtCmdWaitTimeout` - long      Wait timeout for an external command in milliseconds  - `DrbdOptions/auto-quorum` - enum      Enables automatic setting of the 'quroum' and 'on-no-quroum' property      * io-error     * suspend-io     * disabled  - `DrbdOptions/auto-add-quorum-tiebreaker` - boolean_true_false      Enables automatic management (creation and deletion) of tie breaking resource  - `DrbdOptions/auto-diskful` - long      Makes a resource diskful if it was continously diskless primary for X minutes  - `DrbdOptions/auto-diskful-allow-cleanup` - boolean_true_false      Allows this resource to be cleaned up after toggle-disk + resync is finished  - `Writecache/PoolName` - regex[`^[a-zA-Z0-9_][a-zA-Z0-9_-]{2,47}$`]      Linstor storage pool name for writecache  - `Writecache/Size` - regex[`^100%|[0-9]{1,2}([.][0-9]*)?%|[1-9][0-9]{2,}$`]      Size of the writecache in % (0-100) or KiB otherwise  - `Writecache/Options/StartSector` - long      offset from the start of cache device in 512-byte sectors  - `Writecache/Options/HighWatermark` - long      start writeback when the number of used blocks reach this watermark  - `Writecache/Options/LowWatermark` - long      stop writeback when the number of used blocks drops below this watermark  - `Writecache/Options/WritebackJobs` - long      limit the number of blocks that are in flight during writeback. Setting this value reduces writeback throughput, but it may improve latency of read requests  - `Writecache/Options/AutocommitBlocks` - long      when the application writes this amount of blocks without issuing the FLUSH request, the blocks are automatically commited  - `Writecache/Options/AutocommitTime` - long      autocommit time in milliseconds. The data is automatically commited if this time passes and no FLUSH request is received  - `Writecache/Options/Fua` - enum      \"On\" results in \"fua\" as argument, whereas the value \"Off\" results in \"nofua\" argument      * On     * Off  - `Writecache/Options/Additional` - string      Additional arguments passed through  - `Cache/OpMode` - enum      Operation mode      * writeback     * writethrough     * passthrough  - `Cache/MetaPool` - regex[`^[a-zA-Z0-9_][a-zA-Z0-9_-]{2,47}$`]      Name of the storage pool used for the cache metadata. If not specified, this will default to the CachePool property  - `Cache/Metasize` - regex[`^100%|[0-9]{1,2}([.][0-9]*)?%|[1-9][0-9]{2,}$`]      Size of the cache in % (0-100) or KiB otherwise.  - `Cache/CachePool` - regex[`^[a-zA-Z0-9_][a-zA-Z0-9_-]{2,47}$`]      Name of the storage pool used for the cache cache device  - `Cache/Cachesize` - regex[`^100%|[0-9]{1,2}([.][0-9]*)?%|[1-9][0-9]{2,}$`]      Size of the cache in % (0-100) or KiB otherwise.  - `Cache/Blocksize` - long      Block size  - `Cache/Policy` - enum      Replacemant policy      * mq     * smq     * cleaner  - `StorDriver/LvcreateOptions` - regex[`.*`]      Additional parameters added to every 'lvcreate ... ' command  - `StorDriver/ZfscreateOptions` - regex[`.*`]      Additional parameters added to every 'zfs create ... ' command  - `StorDriver/Openflex/ApiHost` - regex[`.+`]      Openflex API host name  - `StorDriver/Openflex/ApiPort` - regex[`[0-9]+`]      Openflex API port  - `StorDriver/Openflex/UserName` - regex[`.+`]      Openflex user name  - `StorDriver/Openflex/UserPassword` - regex[`.+`]      Openflex password  - `StorDriver/Openflex/JobWaitDelay` - regex[`[0-9]+`]      Delay in milliseconds linstor waits between fetching the job status  - `StorDriver/Openflex/JobWaitMaxCount` - regex[`[0-9]+`]      Maximum retries with wait delay until openflex fails  - `Autoplacer/Weights/MaxFreeSpace` - regex[`^[0-9]+([.][0-9]+)?`]      Weight of 'MaxFreeSpace' autoplacer-strategy  - `Autoplacer/Weights/MinReservedSpace` - regex[`^[0-9]+([.][0-9]+)?`]      Weight of 'MinReservedSpace' autoplacer-strategy  - `Autoplacer/Weights/MinRscCount` - regex[`^[0-9]+([.][0-9]+)?`]      Weight of 'MinRscCount' autoplacer-strategy  - `Autoplacer/Weights/MaxThroughput` - regex[`^[0-9]+([.][0-9]+)?`]      Weight of 'MaxThroughput' autoplacer-strategy  - `Autoplacer/PreSelectScript` - string      Filename of the preselection script. File must be in /etc/linstor/selector/  - `Autoplacer/PreSelectScriptTimeout` - long      Timeout in ms Linstor waits for the script to run.  - `Autoplacer/MaxThroughput` - long      The maximum throughput the given storage pool is capable of.  - `DrbdProxy/AutoEnable` - boolean_true_false - `Site` - string - `UpdateCacheInterval` - long      Interval for space cache background updates in seconds  - `DrbdOptions/Disk/on-io-error` - enum     * pass_on     * call-local-io-error     * detach  - `DrbdOptions/Disk/disk-barrier` - boolean - `DrbdOptions/Disk/disk-flushes` - boolean - `DrbdOptions/Disk/disk-drain` - boolean - `DrbdOptions/Disk/md-flushes` - boolean - `DrbdOptions/Disk/resync-after` - string - `DrbdOptions/Disk/al-extents` - range[`67-65534`] - `DrbdOptions/Disk/al-updates` - boolean - `DrbdOptions/Disk/discard-zeroes-if-aligned` - boolean - `DrbdOptions/Disk/disable-write-same` - boolean - `DrbdOptions/Disk/disk-timeout` - range[`0-6000`] - `DrbdOptions/Disk/read-balancing` - enum     * prefer-local     * prefer-remote     * round-robin     * least-pending     * when-congested-remote     * 32K-striping     * 64K-striping     * 128K-striping     * 256K-striping     * 512K-striping     * 1M-striping  - `DrbdOptions/Disk/rs-discard-granularity` - range[`0-1048576`] - `DrbdOptions/PeerDevice/resync-rate` - range[`1-8388608`] - `DrbdOptions/PeerDevice/c-plan-ahead` - range[`0-300`] - `DrbdOptions/PeerDevice/c-delay-target` - range[`1-100`] - `DrbdOptions/PeerDevice/c-fill-target` - range[`0-1048576`] - `DrbdOptions/PeerDevice/c-max-rate` - range[`250-4194304`] - `DrbdOptions/PeerDevice/c-min-rate` - range[`0-4194304`] - `DrbdOptions/PeerDevice/bitmap` - boolean - `DrbdOptions/Resource/cpu-mask` - string - `DrbdOptions/Resource/on-no-data-accessible` - enum     * io-error     * suspend-io  - `DrbdOptions/Resource/auto-promote` - boolean - `DrbdOptions/Resource/peer-ack-window` - range[`2048-204800`] - `DrbdOptions/Resource/peer-ack-delay` - range[`1-10000`] - `DrbdOptions/Resource/twopc-timeout` - range[`50-600`] - `DrbdOptions/Resource/twopc-retry-timeout` - range[`1-50`] - `DrbdOptions/Resource/auto-promote-timeout` - range[`0-600`] - `DrbdOptions/Resource/max-io-depth` - range[`4-4294967295`] - `DrbdOptions/Resource/quorum` - enum [`1-32`]     * off     * majority     * all  - `DrbdOptions/Resource/on-no-quorum` - enum     * io-error     * suspend-io  - `DrbdOptions/Resource/quorum-minimum-redundancy` - enum [`1-32`]     * off     * majority     * all  - `DrbdOptions/Net/transport` - string - `DrbdOptions/Net/protocol` - enum     * A     * B     * C  - `DrbdOptions/Net/timeout` - range[`1-600`] - `DrbdOptions/Net/max-epoch-size` - range[`1-20000`] - `DrbdOptions/Net/connect-int` - range[`1-120`] - `DrbdOptions/Net/ping-int` - range[`1-120`] - `DrbdOptions/Net/sndbuf-size` - range[`0-10485760`] - `DrbdOptions/Net/rcvbuf-size` - range[`0-10485760`] - `DrbdOptions/Net/ko-count` - range[`0-200`] - `DrbdOptions/Net/allow-two-primaries` - boolean - `DrbdOptions/Net/cram-hmac-alg` - string - `DrbdOptions/Net/shared-secret` - string - `DrbdOptions/Net/after-sb-0pri` - enum     * disconnect     * discard-younger-primary     * discard-older-primary     * discard-zero-changes     * discard-least-changes     * discard-local     * discard-remote  - `DrbdOptions/Net/after-sb-1pri` - enum     * disconnect     * consensus     * discard-secondary     * call-pri-lost-after-sb     * violently-as0p  - `DrbdOptions/Net/after-sb-2pri` - enum     * disconnect     * call-pri-lost-after-sb     * violently-as0p  - `DrbdOptions/Net/always-asbp` - boolean - `DrbdOptions/Net/rr-conflict` - enum     * disconnect     * call-pri-lost     * violently     * retry-connect  - `DrbdOptions/Net/ping-timeout` - range[`1-300`] - `DrbdOptions/Net/data-integrity-alg` - string - `DrbdOptions/Net/tcp-cork` - boolean - `DrbdOptions/Net/on-congestion` - enum     * block     * pull-ahead     * disconnect  - `DrbdOptions/Net/congestion-fill` - range[`0-20971520`] - `DrbdOptions/Net/congestion-extents` - range[`67-65534`] - `DrbdOptions/Net/csums-alg` - string - `DrbdOptions/Net/csums-after-crash-only` - boolean - `DrbdOptions/Net/verify-alg` - string - `DrbdOptions/Net/use-rle` - boolean - `DrbdOptions/Net/socket-check-timeout` - range[`0-300`] - `DrbdOptions/Net/fencing` - enum     * dont-care     * resource-only     * resource-and-stonith  - `DrbdOptions/Net/max-buffers` - range[`32-131072`] - `DrbdOptions/Net/allow-remote-read` - boolean - `DrbdOptions/Handlers/after-resync-target` - string - `DrbdOptions/Handlers/before-resync-target` - string - `DrbdOptions/Handlers/before-resync-source` - string - `DrbdOptions/Handlers/out-of-sync` - string - `DrbdOptions/Handlers/quorum-lost` - string - `DrbdOptions/Handlers/fence-peer` - string - `DrbdOptions/Handlers/unfence-peer` - string - `DrbdOptions/Handlers/initial-split-brain` - string - `DrbdOptions/Handlers/local-io-error` - string - `DrbdOptions/Handlers/pri-lost` - string - `DrbdOptions/Handlers/pri-lost-after-sb` - string - `DrbdOptions/Handlers/pri-on-incon-degr` - string - `DrbdOptions/Handlers/split-brain` - string 
     # @param [Hash] opts the optional parameters
     # @option opts [ControllerPropsModify] :controller_props_modify 
     # @return [ApiCallRc]
@@ -150,7 +207,7 @@ module LinstorClient
     end
 
     # sets or modifies controller properties
-    # Sets or modifies properties  Possible properties are: - &#x60;TcpPortAutoRange&#x60; - regex[&#x60;[0-9]+-[0-9]+&#x60;]      Range for auto-allocation of resource TCP ports  - &#x60;MinorNrAutoRange&#x60; - regex[&#x60;[0-9]+-[0-9]+&#x60;]      Range for auto-allocation of volume minor numbers  - &#x60;PeerSlotsNewResource&#x60; - range[&#x60;1-31&#x60;]      DRBD peer slots to allocate for newly created resources (default 7), the number of peer slots cannot be changed once the resource is created, so allow sufficient slots to increase redundancy in the future  - &#x60;StorDriver/DMStats&#x60; - boolean_true_false      Enable dmstats on lvm create  - &#x60;GlobSeqApiCalls&#x60; - boolean_true_false      Globally sequentialize all ctrl -&gt; stlt api calls  - &#x60;REST/bindAddress&#x60; - string      Bind address of the REST API  - &#x60;REST/port&#x60; - range[&#x60;1-65535&#x60;]      TCP Port of the REST API  - &#x60;REST/enabled&#x60; - boolean_true_false      Bool if REST API should be enabled  - &#x60;NVMe/enabled&#x60; - enum     * rdma     * tcp  - &#x60;NVMe/enabled&#x60; - range[&#x60;1-65535&#x60;] - &#x60;NVMe/PrefNic&#x60; - regex[&#x60;^[a-zA-Z0-9_][a-zA-Z0-9_-]{2,47}$&#x60;]      Preferred network interface to use  - &#x60;StorDriver/WaitTimeoutAfterCreate&#x60; - regex[&#x60;[0-9]+&#x60;] - &#x60;sys/fs/blkio_throttle_read&#x60; - long      Sets the /sys/fs/cgroup/blkio/blkio.throttle.read_bps_device  - &#x60;sys/fs/blkio_throttle_write&#x60; - long      Sets the /sys/fs/cgroup/blkio/blkio.throttle.write_bps_device  - &#x60;SearchDomain&#x60; - string      Search domain node names, if no FQDN is given.  - &#x60;ExtCmdWaitTimeout&#x60; - long      Wait timeout for an external command in milliseconds  - &#x60;DrbdOptions/auto-quorum&#x60; - enum      Enables automatic setting of the &#39;quroum&#39; and &#39;on-no-quroum&#39; property      * io-error     * suspend-io     * disabled  - &#x60;DrbdOptions/auto-add-quorum-tiebreaker&#x60; - boolean_true_false      Enables automatic management (creation and deletion) of tie breaking resource  - &#x60;Writecache/PoolName&#x60; - regex[&#x60;^[a-zA-Z0-9_][a-zA-Z0-9_-]{2,47}$&#x60;]      Linstor storage pool name for writecache  - &#x60;Writecache/Size&#x60; - regex[&#x60;^100%|[0-9]{1,2}([.][0-9]*)?%|[1-9][0-9]{2,}$&#x60;]      Size of the writecache in % (0-100) or KiB otherwise  - &#x60;Writecache/Blocksize&#x60; - long      4096 is recommended; the maximum block size is the page size  - &#x60;Writecache/Options/StartSector&#x60; - long      offset from the start of cache device in 512-byte sectors  - &#x60;Writecache/Options/HighWatermark&#x60; - long      start writeback when the number of used blocks reach this watermark  - &#x60;Writecache/Options/LowWatermark&#x60; - long      stop writeback when the number of used blocks drops below this watermark  - &#x60;Writecache/Options/WritebackJobs&#x60; - long      limit the number of blocks that are in flight during writeback. Setting this value reduces writeback throughput, but it may improve latency of read requests  - &#x60;Writecache/Options/AutocommitBlocks&#x60; - long      when the application writes this amount of blocks without issuing the FLUSH request, the blocks are automatically commited  - &#x60;Writecache/Options/AutocommitTime&#x60; - long      autocommit time in milliseconds. The data is automatically commited if this time passes and no FLUSH request is received  - &#x60;Writecache/Options/Fua&#x60; - enum      \&quot;On\&quot; results in \&quot;fua\&quot; as argument, whereas the value \&quot;Off\&quot; results in \&quot;nofua\&quot; argument      * On     * Off  - &#x60;Writecache/Options/Additional&#x60; - string      Additional arguments passed through  - &#x60;DrbdOptions/Disk/read-balancing&#x60; - enum     * prefer-local     * prefer-remote     * round-robin     * least-pending     * when-congested-remote     * 32K-striping     * 64K-striping     * 128K-striping     * 256K-striping     * 512K-striping     * 1M-striping  - &#x60;DrbdOptions/Disk/on-io-error&#x60; - enum     * pass_on     * call-local-io-error     * detach  - &#x60;DrbdOptions/Disk/disk-drain&#x60; - boolean - &#x60;DrbdOptions/Disk/resync-after&#x60; - string - &#x60;DrbdOptions/Disk/disk-timeout&#x60; - range[&#x60;0-6000&#x60;] - &#x60;DrbdOptions/Disk/disable-write-same&#x60; - boolean - &#x60;DrbdOptions/Disk/rs-discard-granularity&#x60; - range[&#x60;0-1048576&#x60;] - &#x60;DrbdOptions/Disk/disk-flushes&#x60; - boolean - &#x60;DrbdOptions/Disk/al-extents&#x60; - range[&#x60;67-65534&#x60;] - &#x60;DrbdOptions/Disk/al-updates&#x60; - boolean - &#x60;DrbdOptions/Disk/md-flushes&#x60; - boolean - &#x60;DrbdOptions/Disk/disk-barrier&#x60; - boolean - &#x60;DrbdOptions/Disk/discard-zeroes-if-aligned&#x60; - boolean - &#x60;DrbdOptions/PeerDevice/c-fill-target&#x60; - range[&#x60;0-1048576&#x60;] - &#x60;DrbdOptions/PeerDevice/c-max-rate&#x60; - range[&#x60;250-4194304&#x60;] - &#x60;DrbdOptions/PeerDevice/resync-rate&#x60; - range[&#x60;1-8388608&#x60;] - &#x60;DrbdOptions/PeerDevice/c-delay-target&#x60; - range[&#x60;1-100&#x60;] - &#x60;DrbdOptions/PeerDevice/c-min-rate&#x60; - range[&#x60;0-4194304&#x60;] - &#x60;DrbdOptions/PeerDevice/bitmap&#x60; - boolean - &#x60;DrbdOptions/PeerDevice/c-plan-ahead&#x60; - range[&#x60;0-300&#x60;] - &#x60;DrbdOptions/Resource/peer-ack-delay&#x60; - range[&#x60;1-10000&#x60;] - &#x60;DrbdOptions/Resource/quorum-minimum-redundancy&#x60; - enum [&#x60;1-32&#x60;]     * off     * majority     * all  - &#x60;DrbdOptions/Resource/max-io-depth&#x60; - range[&#x60;4-4294967295&#x60;] - &#x60;DrbdOptions/Resource/auto-promote-timeout&#x60; - range[&#x60;0-600&#x60;] - &#x60;DrbdOptions/Resource/quorum&#x60; - enum [&#x60;1-32&#x60;]     * off     * majority     * all  - &#x60;DrbdOptions/Resource/on-no-data-accessible&#x60; - enum     * io-error     * suspend-io  - &#x60;DrbdOptions/Resource/auto-promote&#x60; - boolean - &#x60;DrbdOptions/Resource/cpu-mask&#x60; - string - &#x60;DrbdOptions/Resource/twopc-timeout&#x60; - range[&#x60;50-600&#x60;] - &#x60;DrbdOptions/Resource/twopc-retry-timeout&#x60; - range[&#x60;1-50&#x60;] - &#x60;DrbdOptions/Resource/peer-ack-window&#x60; - range[&#x60;2048-204800&#x60;] - &#x60;DrbdOptions/Resource/on-no-quorum&#x60; - enum     * io-error     * suspend-io  - &#x60;DrbdOptions/Net/max-epoch-size&#x60; - range[&#x60;1-20000&#x60;] - &#x60;DrbdOptions/Net/protocol&#x60; - enum     * A     * B     * C  - &#x60;DrbdOptions/Net/allow-two-primaries&#x60; - boolean - &#x60;DrbdOptions/Net/after-sb-0pri&#x60; - enum     * disconnect     * discard-younger-primary     * discard-older-primary     * discard-zero-changes     * discard-least-changes     * discard-local     * discard-remote  - &#x60;DrbdOptions/Net/ko-count&#x60; - range[&#x60;0-200&#x60;] - &#x60;DrbdOptions/Net/data-integrity-alg&#x60; - string - &#x60;DrbdOptions/Net/ping-timeout&#x60; - range[&#x60;1-300&#x60;] - &#x60;DrbdOptions/Net/sndbuf-size&#x60; - range[&#x60;0-10485760&#x60;] - &#x60;DrbdOptions/Net/transport&#x60; - string - &#x60;DrbdOptions/Net/rcvbuf-size&#x60; - range[&#x60;0-10485760&#x60;] - &#x60;DrbdOptions/Net/max-buffers&#x60; - range[&#x60;32-131072&#x60;] - &#x60;DrbdOptions/Net/fencing&#x60; - enum     * dont-care     * resource-only     * resource-and-stonith  - &#x60;DrbdOptions/Net/csums-alg&#x60; - string - &#x60;DrbdOptions/Net/always-asbp&#x60; - boolean - &#x60;DrbdOptions/Net/congestion-extents&#x60; - range[&#x60;67-65534&#x60;] - &#x60;DrbdOptions/Net/on-congestion&#x60; - enum     * block     * pull-ahead     * disconnect  - &#x60;DrbdOptions/Net/ping-int&#x60; - range[&#x60;1-120&#x60;] - &#x60;DrbdOptions/Net/rr-conflict&#x60; - enum     * disconnect     * call-pri-lost     * violently  - &#x60;DrbdOptions/Net/tcp-cork&#x60; - boolean - &#x60;DrbdOptions/Net/use-rle&#x60; - boolean - &#x60;DrbdOptions/Net/csums-after-crash-only&#x60; - boolean - &#x60;DrbdOptions/Net/socket-check-timeout&#x60; - range[&#x60;0-300&#x60;] - &#x60;DrbdOptions/Net/congestion-fill&#x60; - range[&#x60;0-20971520&#x60;] - &#x60;DrbdOptions/Net/cram-hmac-alg&#x60; - string - &#x60;DrbdOptions/Net/verify-alg&#x60; - string - &#x60;DrbdOptions/Net/shared-secret&#x60; - string - &#x60;DrbdOptions/Net/connect-int&#x60; - range[&#x60;1-120&#x60;] - &#x60;DrbdOptions/Net/timeout&#x60; - range[&#x60;1-600&#x60;] - &#x60;DrbdOptions/Net/after-sb-2pri&#x60; - enum     * disconnect     * call-pri-lost-after-sb     * violently-as0p  - &#x60;DrbdOptions/Net/after-sb-1pri&#x60; - enum     * disconnect     * consensus     * discard-secondary     * call-pri-lost-after-sb     * violently-as0p  - &#x60;DrbdOptions/Handlers/after-resync-target&#x60; - string - &#x60;DrbdOptions/Handlers/before-resync-target&#x60; - string - &#x60;DrbdOptions/Handlers/before-resync-source&#x60; - string - &#x60;DrbdOptions/Handlers/out-of-sync&#x60; - string - &#x60;DrbdOptions/Handlers/quorum-lost&#x60; - string - &#x60;DrbdOptions/Handlers/fence-peer&#x60; - string - &#x60;DrbdOptions/Handlers/unfence-peer&#x60; - string - &#x60;DrbdOptions/Handlers/initial-split-brain&#x60; - string - &#x60;DrbdOptions/Handlers/local-io-error&#x60; - string - &#x60;DrbdOptions/Handlers/pri-lost&#x60; - string - &#x60;DrbdOptions/Handlers/pri-lost-after-sb&#x60; - string - &#x60;DrbdOptions/Handlers/pri-on-incon-degr&#x60; - string - &#x60;DrbdOptions/Handlers/split-brain&#x60; - string 
+    # Sets or modifies properties  Possible properties are: - &#x60;TcpPortAutoRange&#x60; - regex[&#x60;[0-9]+-[0-9]+&#x60;]      Range for auto-allocation of resource TCP ports  - &#x60;MinorNrAutoRange&#x60; - regex[&#x60;[0-9]+-[0-9]+&#x60;]      Range for auto-allocation of volume minor numbers  - &#x60;PeerSlotsNewResource&#x60; - range[&#x60;1-31&#x60;]      DRBD peer slots to allocate for newly created resources (default 7), the number of peer slots cannot be changed once the resource is created, so allow sufficient slots to increase redundancy in the future  - &#x60;StorDriver/DMStats&#x60; - boolean_true_false      Enable dmstats on lvm create  - &#x60;REST/disable-http-metrics&#x60; - boolean_true_false      Disable Prometheus /metrics on HTTP, if HTTPS is enabled  - &#x60;DrbdOptions/AutoEvictAfterTime&#x60; - long      Time a node can be offline before it is declared EVICTED in minutes  - &#x60;DrbdOptions/AutoEvictMaxDisconnectedNodes&#x60; - range[&#x60;0-100&#x60;]      Percentage(0-100) of nodes that can disconnect at the same time without the controller stopping the max_offline_time timer  - &#x60;DrbdOptions/AutoEvictMinReplicaCount&#x60; - long      The minimum amount of replicas that should be present for a resource at all times.  - &#x60;NVMe/TRType&#x60; - enum      NVMe transportion type      * rdma     * tcp  - &#x60;NVMe/Port&#x60; - range[&#x60;1-65535&#x60;]      NVMe port  - &#x60;NVMe/PrefNic&#x60; - regex[&#x60;^[a-zA-Z0-9_][a-zA-Z0-9_-]{2,47}$&#x60;]      Preferred network interface to use  - &#x60;StorDriver/WaitTimeoutAfterCreate&#x60; - regex[&#x60;[0-9]+&#x60;] - &#x60;sys/fs/blkio_throttle_read&#x60; - long      Sets the /sys/fs/cgroup/blkio/blkio.throttle.read_bps_device  - &#x60;sys/fs/blkio_throttle_write&#x60; - long      Sets the /sys/fs/cgroup/blkio/blkio.throttle.write_bps_device  - &#x60;sys/fs/blkio_throttle_read_iops&#x60; - long      Sets the /sys/fs/cgroup/blkio/blkio.throttle.read_iops_device  - &#x60;sys/fs/blkio_throttle_write_iops&#x60; - long      Sets the /sys/fs/cgroup/blkio/blkio.throttle.write_iops_device  - &#x60;SearchDomain&#x60; - string      Search domain node names, if no FQDN is given.  - &#x60;ExtCmdWaitTimeout&#x60; - long      Wait timeout for an external command in milliseconds  - &#x60;DrbdOptions/auto-quorum&#x60; - enum      Enables automatic setting of the &#39;quroum&#39; and &#39;on-no-quroum&#39; property      * io-error     * suspend-io     * disabled  - &#x60;DrbdOptions/auto-add-quorum-tiebreaker&#x60; - boolean_true_false      Enables automatic management (creation and deletion) of tie breaking resource  - &#x60;DrbdOptions/auto-diskful&#x60; - long      Makes a resource diskful if it was continously diskless primary for X minutes  - &#x60;DrbdOptions/auto-diskful-allow-cleanup&#x60; - boolean_true_false      Allows this resource to be cleaned up after toggle-disk + resync is finished  - &#x60;Writecache/PoolName&#x60; - regex[&#x60;^[a-zA-Z0-9_][a-zA-Z0-9_-]{2,47}$&#x60;]      Linstor storage pool name for writecache  - &#x60;Writecache/Size&#x60; - regex[&#x60;^100%|[0-9]{1,2}([.][0-9]*)?%|[1-9][0-9]{2,}$&#x60;]      Size of the writecache in % (0-100) or KiB otherwise  - &#x60;Writecache/Options/StartSector&#x60; - long      offset from the start of cache device in 512-byte sectors  - &#x60;Writecache/Options/HighWatermark&#x60; - long      start writeback when the number of used blocks reach this watermark  - &#x60;Writecache/Options/LowWatermark&#x60; - long      stop writeback when the number of used blocks drops below this watermark  - &#x60;Writecache/Options/WritebackJobs&#x60; - long      limit the number of blocks that are in flight during writeback. Setting this value reduces writeback throughput, but it may improve latency of read requests  - &#x60;Writecache/Options/AutocommitBlocks&#x60; - long      when the application writes this amount of blocks without issuing the FLUSH request, the blocks are automatically commited  - &#x60;Writecache/Options/AutocommitTime&#x60; - long      autocommit time in milliseconds. The data is automatically commited if this time passes and no FLUSH request is received  - &#x60;Writecache/Options/Fua&#x60; - enum      \&quot;On\&quot; results in \&quot;fua\&quot; as argument, whereas the value \&quot;Off\&quot; results in \&quot;nofua\&quot; argument      * On     * Off  - &#x60;Writecache/Options/Additional&#x60; - string      Additional arguments passed through  - &#x60;Cache/OpMode&#x60; - enum      Operation mode      * writeback     * writethrough     * passthrough  - &#x60;Cache/MetaPool&#x60; - regex[&#x60;^[a-zA-Z0-9_][a-zA-Z0-9_-]{2,47}$&#x60;]      Name of the storage pool used for the cache metadata. If not specified, this will default to the CachePool property  - &#x60;Cache/Metasize&#x60; - regex[&#x60;^100%|[0-9]{1,2}([.][0-9]*)?%|[1-9][0-9]{2,}$&#x60;]      Size of the cache in % (0-100) or KiB otherwise.  - &#x60;Cache/CachePool&#x60; - regex[&#x60;^[a-zA-Z0-9_][a-zA-Z0-9_-]{2,47}$&#x60;]      Name of the storage pool used for the cache cache device  - &#x60;Cache/Cachesize&#x60; - regex[&#x60;^100%|[0-9]{1,2}([.][0-9]*)?%|[1-9][0-9]{2,}$&#x60;]      Size of the cache in % (0-100) or KiB otherwise.  - &#x60;Cache/Blocksize&#x60; - long      Block size  - &#x60;Cache/Policy&#x60; - enum      Replacemant policy      * mq     * smq     * cleaner  - &#x60;StorDriver/LvcreateOptions&#x60; - regex[&#x60;.*&#x60;]      Additional parameters added to every &#39;lvcreate ... &#39; command  - &#x60;StorDriver/ZfscreateOptions&#x60; - regex[&#x60;.*&#x60;]      Additional parameters added to every &#39;zfs create ... &#39; command  - &#x60;StorDriver/Openflex/ApiHost&#x60; - regex[&#x60;.+&#x60;]      Openflex API host name  - &#x60;StorDriver/Openflex/ApiPort&#x60; - regex[&#x60;[0-9]+&#x60;]      Openflex API port  - &#x60;StorDriver/Openflex/UserName&#x60; - regex[&#x60;.+&#x60;]      Openflex user name  - &#x60;StorDriver/Openflex/UserPassword&#x60; - regex[&#x60;.+&#x60;]      Openflex password  - &#x60;StorDriver/Openflex/JobWaitDelay&#x60; - regex[&#x60;[0-9]+&#x60;]      Delay in milliseconds linstor waits between fetching the job status  - &#x60;StorDriver/Openflex/JobWaitMaxCount&#x60; - regex[&#x60;[0-9]+&#x60;]      Maximum retries with wait delay until openflex fails  - &#x60;Autoplacer/Weights/MaxFreeSpace&#x60; - regex[&#x60;^[0-9]+([.][0-9]+)?&#x60;]      Weight of &#39;MaxFreeSpace&#39; autoplacer-strategy  - &#x60;Autoplacer/Weights/MinReservedSpace&#x60; - regex[&#x60;^[0-9]+([.][0-9]+)?&#x60;]      Weight of &#39;MinReservedSpace&#39; autoplacer-strategy  - &#x60;Autoplacer/Weights/MinRscCount&#x60; - regex[&#x60;^[0-9]+([.][0-9]+)?&#x60;]      Weight of &#39;MinRscCount&#39; autoplacer-strategy  - &#x60;Autoplacer/Weights/MaxThroughput&#x60; - regex[&#x60;^[0-9]+([.][0-9]+)?&#x60;]      Weight of &#39;MaxThroughput&#39; autoplacer-strategy  - &#x60;Autoplacer/PreSelectScript&#x60; - string      Filename of the preselection script. File must be in /etc/linstor/selector/  - &#x60;Autoplacer/PreSelectScriptTimeout&#x60; - long      Timeout in ms Linstor waits for the script to run.  - &#x60;Autoplacer/MaxThroughput&#x60; - long      The maximum throughput the given storage pool is capable of.  - &#x60;DrbdProxy/AutoEnable&#x60; - boolean_true_false - &#x60;Site&#x60; - string - &#x60;UpdateCacheInterval&#x60; - long      Interval for space cache background updates in seconds  - &#x60;DrbdOptions/Disk/on-io-error&#x60; - enum     * pass_on     * call-local-io-error     * detach  - &#x60;DrbdOptions/Disk/disk-barrier&#x60; - boolean - &#x60;DrbdOptions/Disk/disk-flushes&#x60; - boolean - &#x60;DrbdOptions/Disk/disk-drain&#x60; - boolean - &#x60;DrbdOptions/Disk/md-flushes&#x60; - boolean - &#x60;DrbdOptions/Disk/resync-after&#x60; - string - &#x60;DrbdOptions/Disk/al-extents&#x60; - range[&#x60;67-65534&#x60;] - &#x60;DrbdOptions/Disk/al-updates&#x60; - boolean - &#x60;DrbdOptions/Disk/discard-zeroes-if-aligned&#x60; - boolean - &#x60;DrbdOptions/Disk/disable-write-same&#x60; - boolean - &#x60;DrbdOptions/Disk/disk-timeout&#x60; - range[&#x60;0-6000&#x60;] - &#x60;DrbdOptions/Disk/read-balancing&#x60; - enum     * prefer-local     * prefer-remote     * round-robin     * least-pending     * when-congested-remote     * 32K-striping     * 64K-striping     * 128K-striping     * 256K-striping     * 512K-striping     * 1M-striping  - &#x60;DrbdOptions/Disk/rs-discard-granularity&#x60; - range[&#x60;0-1048576&#x60;] - &#x60;DrbdOptions/PeerDevice/resync-rate&#x60; - range[&#x60;1-8388608&#x60;] - &#x60;DrbdOptions/PeerDevice/c-plan-ahead&#x60; - range[&#x60;0-300&#x60;] - &#x60;DrbdOptions/PeerDevice/c-delay-target&#x60; - range[&#x60;1-100&#x60;] - &#x60;DrbdOptions/PeerDevice/c-fill-target&#x60; - range[&#x60;0-1048576&#x60;] - &#x60;DrbdOptions/PeerDevice/c-max-rate&#x60; - range[&#x60;250-4194304&#x60;] - &#x60;DrbdOptions/PeerDevice/c-min-rate&#x60; - range[&#x60;0-4194304&#x60;] - &#x60;DrbdOptions/PeerDevice/bitmap&#x60; - boolean - &#x60;DrbdOptions/Resource/cpu-mask&#x60; - string - &#x60;DrbdOptions/Resource/on-no-data-accessible&#x60; - enum     * io-error     * suspend-io  - &#x60;DrbdOptions/Resource/auto-promote&#x60; - boolean - &#x60;DrbdOptions/Resource/peer-ack-window&#x60; - range[&#x60;2048-204800&#x60;] - &#x60;DrbdOptions/Resource/peer-ack-delay&#x60; - range[&#x60;1-10000&#x60;] - &#x60;DrbdOptions/Resource/twopc-timeout&#x60; - range[&#x60;50-600&#x60;] - &#x60;DrbdOptions/Resource/twopc-retry-timeout&#x60; - range[&#x60;1-50&#x60;] - &#x60;DrbdOptions/Resource/auto-promote-timeout&#x60; - range[&#x60;0-600&#x60;] - &#x60;DrbdOptions/Resource/max-io-depth&#x60; - range[&#x60;4-4294967295&#x60;] - &#x60;DrbdOptions/Resource/quorum&#x60; - enum [&#x60;1-32&#x60;]     * off     * majority     * all  - &#x60;DrbdOptions/Resource/on-no-quorum&#x60; - enum     * io-error     * suspend-io  - &#x60;DrbdOptions/Resource/quorum-minimum-redundancy&#x60; - enum [&#x60;1-32&#x60;]     * off     * majority     * all  - &#x60;DrbdOptions/Net/transport&#x60; - string - &#x60;DrbdOptions/Net/protocol&#x60; - enum     * A     * B     * C  - &#x60;DrbdOptions/Net/timeout&#x60; - range[&#x60;1-600&#x60;] - &#x60;DrbdOptions/Net/max-epoch-size&#x60; - range[&#x60;1-20000&#x60;] - &#x60;DrbdOptions/Net/connect-int&#x60; - range[&#x60;1-120&#x60;] - &#x60;DrbdOptions/Net/ping-int&#x60; - range[&#x60;1-120&#x60;] - &#x60;DrbdOptions/Net/sndbuf-size&#x60; - range[&#x60;0-10485760&#x60;] - &#x60;DrbdOptions/Net/rcvbuf-size&#x60; - range[&#x60;0-10485760&#x60;] - &#x60;DrbdOptions/Net/ko-count&#x60; - range[&#x60;0-200&#x60;] - &#x60;DrbdOptions/Net/allow-two-primaries&#x60; - boolean - &#x60;DrbdOptions/Net/cram-hmac-alg&#x60; - string - &#x60;DrbdOptions/Net/shared-secret&#x60; - string - &#x60;DrbdOptions/Net/after-sb-0pri&#x60; - enum     * disconnect     * discard-younger-primary     * discard-older-primary     * discard-zero-changes     * discard-least-changes     * discard-local     * discard-remote  - &#x60;DrbdOptions/Net/after-sb-1pri&#x60; - enum     * disconnect     * consensus     * discard-secondary     * call-pri-lost-after-sb     * violently-as0p  - &#x60;DrbdOptions/Net/after-sb-2pri&#x60; - enum     * disconnect     * call-pri-lost-after-sb     * violently-as0p  - &#x60;DrbdOptions/Net/always-asbp&#x60; - boolean - &#x60;DrbdOptions/Net/rr-conflict&#x60; - enum     * disconnect     * call-pri-lost     * violently     * retry-connect  - &#x60;DrbdOptions/Net/ping-timeout&#x60; - range[&#x60;1-300&#x60;] - &#x60;DrbdOptions/Net/data-integrity-alg&#x60; - string - &#x60;DrbdOptions/Net/tcp-cork&#x60; - boolean - &#x60;DrbdOptions/Net/on-congestion&#x60; - enum     * block     * pull-ahead     * disconnect  - &#x60;DrbdOptions/Net/congestion-fill&#x60; - range[&#x60;0-20971520&#x60;] - &#x60;DrbdOptions/Net/congestion-extents&#x60; - range[&#x60;67-65534&#x60;] - &#x60;DrbdOptions/Net/csums-alg&#x60; - string - &#x60;DrbdOptions/Net/csums-after-crash-only&#x60; - boolean - &#x60;DrbdOptions/Net/verify-alg&#x60; - string - &#x60;DrbdOptions/Net/use-rle&#x60; - boolean - &#x60;DrbdOptions/Net/socket-check-timeout&#x60; - range[&#x60;0-300&#x60;] - &#x60;DrbdOptions/Net/fencing&#x60; - enum     * dont-care     * resource-only     * resource-and-stonith  - &#x60;DrbdOptions/Net/max-buffers&#x60; - range[&#x60;32-131072&#x60;] - &#x60;DrbdOptions/Net/allow-remote-read&#x60; - boolean - &#x60;DrbdOptions/Handlers/after-resync-target&#x60; - string - &#x60;DrbdOptions/Handlers/before-resync-target&#x60; - string - &#x60;DrbdOptions/Handlers/before-resync-source&#x60; - string - &#x60;DrbdOptions/Handlers/out-of-sync&#x60; - string - &#x60;DrbdOptions/Handlers/quorum-lost&#x60; - string - &#x60;DrbdOptions/Handlers/fence-peer&#x60; - string - &#x60;DrbdOptions/Handlers/unfence-peer&#x60; - string - &#x60;DrbdOptions/Handlers/initial-split-brain&#x60; - string - &#x60;DrbdOptions/Handlers/local-io-error&#x60; - string - &#x60;DrbdOptions/Handlers/pri-lost&#x60; - string - &#x60;DrbdOptions/Handlers/pri-lost-after-sb&#x60; - string - &#x60;DrbdOptions/Handlers/pri-on-incon-degr&#x60; - string - &#x60;DrbdOptions/Handlers/split-brain&#x60; - string 
     # @param [Hash] opts the optional parameters
     # @option opts [ControllerPropsModify] :controller_props_modify 
     # @return [Array<(ApiCallRc, Integer, Hash)>] ApiCallRc data, response status code and response headers
@@ -261,7 +318,7 @@ module LinstorClient
     end
 
     # creates an LVM, LVM-thin or ZFS pool, optional VDO under it
-    # Creates a LVM/LVM-thin, ZFS pool on the given device and if supported VDO(optional) under it. logcal_size_kib parameter is only needed if LVM-thin or vdo is used is used. Also note VDO can only used with LVM-fat. 
+    # Creates a LVM/LVM-thin, ZFS pool on the given device and if supported VDO(optional) under it. logcal_size_kib parameter is only needed if LVM-thin or vdo is used. Also note VDO can only used with LVM-fat. 
     # @param node [String] node to use
     # @param [Hash] opts the optional parameters
     # @option opts [PhysicalStorageCreate] :physical_storage_create 
@@ -272,7 +329,7 @@ module LinstorClient
     end
 
     # creates an LVM, LVM-thin or ZFS pool, optional VDO under it
-    # Creates a LVM/LVM-thin, ZFS pool on the given device and if supported VDO(optional) under it. logcal_size_kib parameter is only needed if LVM-thin or vdo is used is used. Also note VDO can only used with LVM-fat. 
+    # Creates a LVM/LVM-thin, ZFS pool on the given device and if supported VDO(optional) under it. logcal_size_kib parameter is only needed if LVM-thin or vdo is used. Also note VDO can only used with LVM-fat. 
     # @param node [String] node to use
     # @param [Hash] opts the optional parameters
     # @option opts [PhysicalStorageCreate] :physical_storage_create 
@@ -326,6 +383,196 @@ module LinstorClient
       data, status_code, headers = @api_client.call_api(:POST, local_var_path, new_options)
       if @api_client.config.debugging
         @api_client.config.logger.debug "API called: DevelopersApi#create_device_pool\nData: #{data.inspect}\nStatus code: #{status_code}\nHeaders: #{headers}"
+      end
+      return data, status_code, headers
+    end
+
+    # creates a SOS report in the log directory of the controller
+    # @param node [String] node to use
+    # @param [Hash] opts the optional parameters
+    # @option opts [Integer] :since Unix epoch milliseconds
+    # @return [ApiCallRc]
+    def create_sos_report(node, opts = {})
+      data, _status_code, _headers = create_sos_report_with_http_info(node, opts)
+      data
+    end
+
+    # creates a SOS report in the log directory of the controller
+    # @param node [String] node to use
+    # @param [Hash] opts the optional parameters
+    # @option opts [Integer] :since Unix epoch milliseconds
+    # @return [Array<(ApiCallRc, Integer, Hash)>] ApiCallRc data, response status code and response headers
+    def create_sos_report_with_http_info(node, opts = {})
+      if @api_client.config.debugging
+        @api_client.config.logger.debug 'Calling API: DevelopersApi.create_sos_report ...'
+      end
+      # verify the required parameter 'node' is set
+      if @api_client.config.client_side_validation && node.nil?
+        fail ArgumentError, "Missing the required parameter 'node' when calling DevelopersApi.create_sos_report"
+      end
+      # resource path
+      local_var_path = '/v1/sos-report'.sub('{' + 'node' + '}', CGI.escape(node.to_s))
+
+      # query parameters
+      query_params = opts[:query_params] || {}
+      query_params[:'since'] = opts[:'since'] if !opts[:'since'].nil?
+
+      # header parameters
+      header_params = opts[:header_params] || {}
+      # HTTP header 'Accept' (if needed)
+      header_params['Accept'] = @api_client.select_header_accept(['application/json'])
+
+      # form parameters
+      form_params = opts[:form_params] || {}
+
+      # http body (model)
+      post_body = opts[:debug_body]
+
+      # return_type
+      return_type = opts[:debug_return_type] || 'ApiCallRc'
+
+      # auth_names
+      auth_names = opts[:debug_auth_names] || []
+
+      new_options = opts.merge(
+        :operation => :"DevelopersApi.create_sos_report",
+        :header_params => header_params,
+        :query_params => query_params,
+        :form_params => form_params,
+        :body => post_body,
+        :auth_names => auth_names,
+        :return_type => return_type
+      )
+
+      data, status_code, headers = @api_client.call_api(:GET, local_var_path, new_options)
+      if @api_client.config.debugging
+        @api_client.config.logger.debug "API called: DevelopersApi#create_sos_report\nData: #{data.inspect}\nStatus code: #{status_code}\nHeaders: #{headers}"
+      end
+      return data, status_code, headers
+    end
+
+    # modify controller config
+    # @param [Hash] opts the optional parameters
+    # @option opts [ControllerConfig] :controller_config 
+    # @return [ApiCallRc]
+    def ctrl_set_config(opts = {})
+      data, _status_code, _headers = ctrl_set_config_with_http_info(opts)
+      data
+    end
+
+    # modify controller config
+    # @param [Hash] opts the optional parameters
+    # @option opts [ControllerConfig] :controller_config 
+    # @return [Array<(ApiCallRc, Integer, Hash)>] ApiCallRc data, response status code and response headers
+    def ctrl_set_config_with_http_info(opts = {})
+      if @api_client.config.debugging
+        @api_client.config.logger.debug 'Calling API: DevelopersApi.ctrl_set_config ...'
+      end
+      # resource path
+      local_var_path = '/v1/controller/config'
+
+      # query parameters
+      query_params = opts[:query_params] || {}
+
+      # header parameters
+      header_params = opts[:header_params] || {}
+      # HTTP header 'Accept' (if needed)
+      header_params['Accept'] = @api_client.select_header_accept(['application/json'])
+      # HTTP header 'Content-Type'
+      content_type = @api_client.select_header_content_type(['application/json'])
+      if !content_type.nil?
+          header_params['Content-Type'] = content_type
+      end
+
+      # form parameters
+      form_params = opts[:form_params] || {}
+
+      # http body (model)
+      post_body = opts[:debug_body] || @api_client.object_to_http_body(opts[:'controller_config'])
+
+      # return_type
+      return_type = opts[:debug_return_type] || 'ApiCallRc'
+
+      # auth_names
+      auth_names = opts[:debug_auth_names] || []
+
+      new_options = opts.merge(
+        :operation => :"DevelopersApi.ctrl_set_config",
+        :header_params => header_params,
+        :query_params => query_params,
+        :form_params => form_params,
+        :body => post_body,
+        :auth_names => auth_names,
+        :return_type => return_type
+      )
+
+      data, status_code, headers = @api_client.call_api(:PUT, local_var_path, new_options)
+      if @api_client.config.debugging
+        @api_client.config.logger.debug "API called: DevelopersApi#ctrl_set_config\nData: #{data.inspect}\nStatus code: #{status_code}\nHeaders: #{headers}"
+      end
+      return data, status_code, headers
+    end
+
+    # request sos report to download
+    # @param node [String] node to use
+    # @param [Hash] opts the optional parameters
+    # @option opts [Integer] :since Unix epoch milliseconds
+    # @return [File]
+    def download_sos_report(node, opts = {})
+      data, _status_code, _headers = download_sos_report_with_http_info(node, opts)
+      data
+    end
+
+    # request sos report to download
+    # @param node [String] node to use
+    # @param [Hash] opts the optional parameters
+    # @option opts [Integer] :since Unix epoch milliseconds
+    # @return [Array<(File, Integer, Hash)>] File data, response status code and response headers
+    def download_sos_report_with_http_info(node, opts = {})
+      if @api_client.config.debugging
+        @api_client.config.logger.debug 'Calling API: DevelopersApi.download_sos_report ...'
+      end
+      # verify the required parameter 'node' is set
+      if @api_client.config.client_side_validation && node.nil?
+        fail ArgumentError, "Missing the required parameter 'node' when calling DevelopersApi.download_sos_report"
+      end
+      # resource path
+      local_var_path = '/v1/sos-report/download'.sub('{' + 'node' + '}', CGI.escape(node.to_s))
+
+      # query parameters
+      query_params = opts[:query_params] || {}
+      query_params[:'since'] = opts[:'since'] if !opts[:'since'].nil?
+
+      # header parameters
+      header_params = opts[:header_params] || {}
+      # HTTP header 'Accept' (if needed)
+      header_params['Accept'] = @api_client.select_header_accept(['application/octet-stream', 'application/json'])
+
+      # form parameters
+      form_params = opts[:form_params] || {}
+
+      # http body (model)
+      post_body = opts[:debug_body]
+
+      # return_type
+      return_type = opts[:debug_return_type] || 'File'
+
+      # auth_names
+      auth_names = opts[:debug_auth_names] || []
+
+      new_options = opts.merge(
+        :operation => :"DevelopersApi.download_sos_report",
+        :header_params => header_params,
+        :query_params => query_params,
+        :form_params => form_params,
+        :body => post_body,
+        :auth_names => auth_names,
+        :return_type => return_type
+      )
+
+      data, status_code, headers = @api_client.call_api(:GET, local_var_path, new_options)
+      if @api_client.config.debugging
+        @api_client.config.logger.debug "API called: DevelopersApi#download_sos_report\nData: #{data.inspect}\nStatus code: #{status_code}\nHeaders: #{headers}"
       end
       return data, status_code, headers
     end
@@ -516,11 +763,138 @@ module LinstorClient
       return data, status_code, headers
     end
 
+    # Deletes a range of error-reports
+    # Deletes a range of error-reports
+    # @param [Hash] opts the optional parameters
+    # @option opts [ErrorReportDelete] :error_report_delete 
+    # @return [ApiCallRc]
+    def error_report_delete(opts = {})
+      data, _status_code, _headers = error_report_delete_with_http_info(opts)
+      data
+    end
+
+    # Deletes a range of error-reports
+    # Deletes a range of error-reports
+    # @param [Hash] opts the optional parameters
+    # @option opts [ErrorReportDelete] :error_report_delete 
+    # @return [Array<(ApiCallRc, Integer, Hash)>] ApiCallRc data, response status code and response headers
+    def error_report_delete_with_http_info(opts = {})
+      if @api_client.config.debugging
+        @api_client.config.logger.debug 'Calling API: DevelopersApi.error_report_delete ...'
+      end
+      # resource path
+      local_var_path = '/v1/error-reports'
+
+      # query parameters
+      query_params = opts[:query_params] || {}
+
+      # header parameters
+      header_params = opts[:header_params] || {}
+      # HTTP header 'Accept' (if needed)
+      header_params['Accept'] = @api_client.select_header_accept(['application/json'])
+      # HTTP header 'Content-Type'
+      content_type = @api_client.select_header_content_type(['application/json'])
+      if !content_type.nil?
+          header_params['Content-Type'] = content_type
+      end
+
+      # form parameters
+      form_params = opts[:form_params] || {}
+
+      # http body (model)
+      post_body = opts[:debug_body] || @api_client.object_to_http_body(opts[:'error_report_delete'])
+
+      # return_type
+      return_type = opts[:debug_return_type] || 'ApiCallRc'
+
+      # auth_names
+      auth_names = opts[:debug_auth_names] || []
+
+      new_options = opts.merge(
+        :operation => :"DevelopersApi.error_report_delete",
+        :header_params => header_params,
+        :query_params => query_params,
+        :form_params => form_params,
+        :body => post_body,
+        :auth_names => auth_names,
+        :return_type => return_type
+      )
+
+      data, status_code, headers = @api_client.call_api(:PATCH, local_var_path, new_options)
+      if @api_client.config.debugging
+        @api_client.config.logger.debug "API called: DevelopersApi#error_report_delete\nData: #{data.inspect}\nStatus code: #{status_code}\nHeaders: #{headers}"
+      end
+      return data, status_code, headers
+    end
+
+    # Deletes a single error-report
+    # Deletes a single error-report
+    # @param reportid [String] Error id to select
+    # @param [Hash] opts the optional parameters
+    # @return [ApiCallRc]
+    def error_report_delete_single(reportid, opts = {})
+      data, _status_code, _headers = error_report_delete_single_with_http_info(reportid, opts)
+      data
+    end
+
+    # Deletes a single error-report
+    # Deletes a single error-report
+    # @param reportid [String] Error id to select
+    # @param [Hash] opts the optional parameters
+    # @return [Array<(ApiCallRc, Integer, Hash)>] ApiCallRc data, response status code and response headers
+    def error_report_delete_single_with_http_info(reportid, opts = {})
+      if @api_client.config.debugging
+        @api_client.config.logger.debug 'Calling API: DevelopersApi.error_report_delete_single ...'
+      end
+      # verify the required parameter 'reportid' is set
+      if @api_client.config.client_side_validation && reportid.nil?
+        fail ArgumentError, "Missing the required parameter 'reportid' when calling DevelopersApi.error_report_delete_single"
+      end
+      # resource path
+      local_var_path = '/v1/error-reports/{reportid}'.sub('{' + 'reportid' + '}', CGI.escape(reportid.to_s))
+
+      # query parameters
+      query_params = opts[:query_params] || {}
+
+      # header parameters
+      header_params = opts[:header_params] || {}
+      # HTTP header 'Accept' (if needed)
+      header_params['Accept'] = @api_client.select_header_accept(['application/json'])
+
+      # form parameters
+      form_params = opts[:form_params] || {}
+
+      # http body (model)
+      post_body = opts[:debug_body]
+
+      # return_type
+      return_type = opts[:debug_return_type] || 'ApiCallRc'
+
+      # auth_names
+      auth_names = opts[:debug_auth_names] || []
+
+      new_options = opts.merge(
+        :operation => :"DevelopersApi.error_report_delete_single",
+        :header_params => header_params,
+        :query_params => query_params,
+        :form_params => form_params,
+        :body => post_body,
+        :auth_names => auth_names,
+        :return_type => return_type
+      )
+
+      data, status_code, headers = @api_client.call_api(:DELETE, local_var_path, new_options)
+      if @api_client.config.debugging
+        @api_client.config.logger.debug "API called: DevelopersApi#error_report_delete_single\nData: #{data.inspect}\nStatus code: #{status_code}\nHeaders: #{headers}"
+      end
+      return data, status_code, headers
+    end
+
     # list all error reports
     # List all error reports
     # @param [Hash] opts the optional parameters
     # @option opts [String] :node Only show error reports of this node
-    # @option opts [Integer] :since Unix timestamp from the starting interval
+    # @option opts [Integer] :since Unix epoch milliseconds
     # @option opts [Integer] :to Unix timestamp to the ending interval
     # @option opts [Boolean] :with_content Include error report text in response. (default to false)
     # @option opts [Integer] :offset number of records to skip for pagination
@@ -535,7 +909,7 @@ module LinstorClient
     # List all error reports
     # @param [Hash] opts the optional parameters
     # @option opts [String] :node Only show error reports of this node
-    # @option opts [Integer] :since Unix timestamp from the starting interval
+    # @option opts [Integer] :since Unix epoch milliseconds
     # @option opts [Integer] :to Unix timestamp to the ending interval
     # @option opts [Boolean] :with_content Include error report text in response.
     # @option opts [Integer] :offset number of records to skip for pagination
@@ -608,7 +982,7 @@ module LinstorClient
     # @param reportid [String] Error id to select
     # @param [Hash] opts the optional parameters
     # @option opts [String] :node Only show error reports of this node
-    # @option opts [Integer] :since Unix timestamp from the starting interval
+    # @option opts [Integer] :since Unix epoch milliseconds
     # @option opts [Integer] :to Unix timestamp to the ending interval
     # @option opts [Boolean] :with_content Include error report text in response. (default to true)
     # @option opts [Integer] :offset number of records to skip for pagination
@@ -624,7 +998,7 @@ module LinstorClient
     # @param reportid [String] Error id to select
     # @param [Hash] opts the optional parameters
     # @option opts [String] :node Only show error reports of this node
-    # @option opts [Integer] :since Unix timestamp from the starting interval
+    # @option opts [Integer] :since Unix epoch milliseconds
     # @option opts [Integer] :to Unix timestamp to the ending interval
     # @option opts [Boolean] :with_content Include error report text in response.
     # @option opts [Integer] :offset number of records to skip for pagination
@@ -1375,6 +1749,8 @@ module LinstorClient
     # Lists nodes registered to the controller
     # Returns an array of all nodes registered to Linstor. 
     # @param [Hash] opts the optional parameters
+    # @option opts [Array<String>] :nodes Filter only for the specified nodes, if not specified, no filtering.
+    # @option opts [Array<String>] :props filter by given properties, full property path
     # @option opts [Integer] :offset number of records to skip for pagination
     # @option opts [Integer] :limit maximum number of records to return
     # @return [Array<Node>]
@@ -1386,6 +1762,8 @@ module LinstorClient
     # Lists nodes registered to the controller
     # Returns an array of all nodes registered to Linstor. 
     # @param [Hash] opts the optional parameters
+    # @option opts [Array<String>] :nodes Filter only for the specified nodes, if not specified, no filtering.
+    # @option opts [Array<String>] :props filter by given properties, full property path
     # @option opts [Integer] :offset number of records to skip for pagination
     # @option opts [Integer] :limit maximum number of records to return
     # @return [Array<(Array<Node>, Integer, Hash)>] Array<Node> data, response status code and response headers
@@ -1410,6 +1788,8 @@ module LinstorClient
 
       # query parameters
       query_params = opts[:query_params] || {}
+      query_params[:'nodes'] = @api_client.build_collection_param(opts[:'nodes'], :multi) if !opts[:'nodes'].nil?
+      query_params[:'props'] = @api_client.build_collection_param(opts[:'props'], :multi) if !opts[:'props'].nil?
       query_params[:'offset'] = opts[:'offset'] if !opts[:'offset'].nil?
       query_params[:'limit'] = opts[:'limit'] if !opts[:'limit'].nil?
 
@@ -1511,7 +1891,7 @@ module LinstorClient
     end
 
     # modify a node
-    # Sets or modifies properties  Possible properties are: - `PrefNic` - regex[`^[a-zA-Z0-9_][a-zA-Z0-9_-]{2,47}$`]      Preferred network interface to use  - `StorPoolName` - regex[`^[a-zA-Z0-9_][a-zA-Z0-9_-]{2,47}$`]      Linstor storage pool name to use.  - `StorPoolNameDrbdMeta` - regex[`^|.internal|[a-zA-Z0-9_][a-zA-Z0-9_-]{2,47}$`]      Linstor storage pool name to use.  - `DrbdMetaType` - enum     * external     * internal  - `sys/fs/blkio_throttle_read` - long      Sets the /sys/fs/cgroup/blkio/blkio.throttle.read_bps_device  - `sys/fs/blkio_throttle_write` - long      Sets the /sys/fs/cgroup/blkio/blkio.throttle.write_bps_device  - `Writecache/PoolName` - regex[`^[a-zA-Z0-9_][a-zA-Z0-9_-]{2,47}$`]      Linstor storage pool name for writecache  - `Writecache/Size` - regex[`^100%|[0-9]{1,2}([.][0-9]*)?%|[1-9][0-9]{2,}$`]      Size of the writecache in % (0-100) or KiB otherwise  - `Writecache/Blocksize` - long      4096 is recommended; the maximum block size is the page size  - `Writecache/Options/StartSector` - long      offset from the start of cache device in 512-byte sectors  - `Writecache/Options/HighWatermark` - long      start writeback when the number of used blocks reach this watermark  - `Writecache/Options/LowWatermark` - long      stop writeback when the number of used blocks drops below this watermark  - `Writecache/Options/WritebackJobs` - long      limit the number of blocks that are in flight during writeback. Setting this value reduces writeback throughput, but it may improve latency of read requests  - `Writecache/Options/AutocommitBlocks` - long      when the application writes this amount of blocks without issuing the FLUSH request, the blocks are automatically commited  - `Writecache/Options/AutocommitTime` - long      autocommit time in milliseconds. The data is automatically commited if this time passes and no FLUSH request is received  - `Writecache/Options/Fua` - enum      \"On\" results in \"fua\" as argument, whereas the value \"Off\" results in \"nofua\" argument      * On     * Off  - `Writecache/Options/Additional` - string      Additional arguments passed through  
+    # Sets or modifies properties  Possible properties are: - `PrefNic` - regex[`^[a-zA-Z0-9_][a-zA-Z0-9_-]{2,47}$`]      Preferred network interface to use  - `StorPoolName` - regex[`^[a-zA-Z0-9_][a-zA-Z0-9_-]{2,47}$`]      Linstor storage pool name to use.  - `StorPoolNameDrbdMeta` - regex[`^|.internal|[a-zA-Z0-9_][a-zA-Z0-9_-]{2,47}$`]      Linstor storage pool name to use for external metadata.  - `sys/fs/blkio_throttle_read` - long      Sets the /sys/fs/cgroup/blkio/blkio.throttle.read_bps_device  - `sys/fs/blkio_throttle_write` - long      Sets the /sys/fs/cgroup/blkio/blkio.throttle.write_bps_device  - `sys/fs/blkio_throttle_read_iops` - long      Sets the /sys/fs/cgroup/blkio/blkio.throttle.read_iops_device  - `sys/fs/blkio_throttle_write_iops` - long      Sets the /sys/fs/cgroup/blkio/blkio.throttle.write_iops_device  - `DrbdOptions/AutoEvictAfterTime` - long      Time a node can be offline before it is declared EVICTED in minutes  - `Writecache/PoolName` - regex[`^[a-zA-Z0-9_][a-zA-Z0-9_-]{2,47}$`]      Linstor storage pool name for writecache  - `Writecache/Size` - regex[`^100%|[0-9]{1,2}([.][0-9]*)?%|[1-9][0-9]{2,}$`]      Size of the writecache in % (0-100) or KiB otherwise  - `Writecache/Options/StartSector` - long      offset from the start of cache device in 512-byte sectors  - `Writecache/Options/HighWatermark` - long      start writeback when the number of used blocks reach this watermark  - `Writecache/Options/LowWatermark` - long      stop writeback when the number of used blocks drops below this watermark  - `Writecache/Options/WritebackJobs` - long      limit the number of blocks that are in flight during writeback. Setting this value reduces writeback throughput, but it may improve latency of read requests  - `Writecache/Options/AutocommitBlocks` - long      when the application writes this amount of blocks without issuing the FLUSH request, the blocks are automatically commited  - `Writecache/Options/AutocommitTime` - long      autocommit time in milliseconds. The data is automatically commited if this time passes and no FLUSH request is received  - `Writecache/Options/Fua` - enum      \"On\" results in \"fua\" as argument, whereas the value \"Off\" results in \"nofua\" argument      * On     * Off  - `Writecache/Options/Additional` - string      Additional arguments passed through  - `Cache/OpMode` - enum      Operation mode      * writeback     * writethrough     * passthrough  - `Cache/MetaPool` - regex[`^[a-zA-Z0-9_][a-zA-Z0-9_-]{2,47}$`]      Name of the storage pool used for the cache metadata. If not specified, this will default to the CachePool property  - `Cache/Metasize` - regex[`^100%|[0-9]{1,2}([.][0-9]*)?%|[1-9][0-9]{2,}$`]      Size of the cache in % (0-100) or KiB otherwise.  - `Cache/CachePool` - regex[`^[a-zA-Z0-9_][a-zA-Z0-9_-]{2,47}$`]      Name of the storage pool used for the cache cache device  - `Cache/Cachesize` - regex[`^100%|[0-9]{1,2}([.][0-9]*)?%|[1-9][0-9]{2,}$`]      Size of the cache in % (0-100) or KiB otherwise.  - `Cache/Blocksize` - long      Block size  - `Cache/Policy` - enum      Replacemant policy      * mq     * smq     * cleaner  - `StorDriver/LvcreateOptions` - regex[`.*`]      Additional parameters added to every 'lvcreate ... ' command  - `StorDriver/ZfscreateOptions` - regex[`.*`]      Additional parameters added to every 'zfs create ... ' command  - `StorDriver/Openflex/ApiHost` - regex[`.+`]      Openflex API host name  - `StorDriver/Openflex/ApiPort` - regex[`[0-9]+`]      Openflex API port  - `StorDriver/Openflex/UserName` - regex[`.+`]      Openflex user name  - `StorDriver/Openflex/UserPassword` - regex[`.+`]      Openflex password  - `StorDriver/Openflex/StorDev` - regex[`.+`]      Openflex storage device  - `StorDriver/Openflex/StorDevHost` - regex[`.+`]      Openflex storage device host  - `StorDriver/Openflex/JobWaitDelay` - regex[`[0-9]+`]      Delay in milliseconds linstor waits between fetching the job status  - `StorDriver/Openflex/JobWaitMaxCount` - regex[`[0-9]+`]      Maximum retries with wait delay until openflex fails  - `Autoplacer/MaxThroughput` - long      The maximum throughput the given storage pool is capable of.  - `DrbdProxy/AutoEnable` - boolean_true_false - `Site` - string - `DrbdOptions/auto-diskful-allow-cleanup` - boolean_true_false      Allows this resource to be cleaned up after toggle-disk + resync is finished 
     # @param node [String] node to use
     # @param [Hash] opts the optional parameters
     # @option opts [NodeModify] :node_modify 
@@ -1522,7 +1902,7 @@ module LinstorClient
     end
 
     # modify a node
-    # Sets or modifies properties  Possible properties are: - &#x60;PrefNic&#x60; - regex[&#x60;^[a-zA-Z0-9_][a-zA-Z0-9_-]{2,47}$&#x60;]      Preferred network interface to use  - &#x60;StorPoolName&#x60; - regex[&#x60;^[a-zA-Z0-9_][a-zA-Z0-9_-]{2,47}$&#x60;]      Linstor storage pool name to use.  - &#x60;StorPoolNameDrbdMeta&#x60; - regex[&#x60;^|.internal|[a-zA-Z0-9_][a-zA-Z0-9_-]{2,47}$&#x60;]      Linstor storage pool name to use.  - &#x60;DrbdMetaType&#x60; - enum     * external     * internal  - &#x60;sys/fs/blkio_throttle_read&#x60; - long      Sets the /sys/fs/cgroup/blkio/blkio.throttle.read_bps_device  - &#x60;sys/fs/blkio_throttle_write&#x60; - long      Sets the /sys/fs/cgroup/blkio/blkio.throttle.write_bps_device  - &#x60;Writecache/PoolName&#x60; - regex[&#x60;^[a-zA-Z0-9_][a-zA-Z0-9_-]{2,47}$&#x60;]      Linstor storage pool name for writecache  - &#x60;Writecache/Size&#x60; - regex[&#x60;^100%|[0-9]{1,2}([.][0-9]*)?%|[1-9][0-9]{2,}$&#x60;]      Size of the writecache in % (0-100) or KiB otherwise  - &#x60;Writecache/Blocksize&#x60; - long      4096 is recommended; the maximum block size is the page size  - &#x60;Writecache/Options/StartSector&#x60; - long      offset from the start of cache device in 512-byte sectors  - &#x60;Writecache/Options/HighWatermark&#x60; - long      start writeback when the number of used blocks reach this watermark  - &#x60;Writecache/Options/LowWatermark&#x60; - long      stop writeback when the number of used blocks drops below this watermark  - &#x60;Writecache/Options/WritebackJobs&#x60; - long      limit the number of blocks that are in flight during writeback. Setting this value reduces writeback throughput, but it may improve latency of read requests  - &#x60;Writecache/Options/AutocommitBlocks&#x60; - long      when the application writes this amount of blocks without issuing the FLUSH request, the blocks are automatically commited  - &#x60;Writecache/Options/AutocommitTime&#x60; - long      autocommit time in milliseconds. The data is automatically commited if this time passes and no FLUSH request is received  - &#x60;Writecache/Options/Fua&#x60; - enum      \&quot;On\&quot; results in \&quot;fua\&quot; as argument, whereas the value \&quot;Off\&quot; results in \&quot;nofua\&quot; argument      * On     * Off  - &#x60;Writecache/Options/Additional&#x60; - string      Additional arguments passed through  
+    # Sets or modifies properties  Possible properties are: - &#x60;PrefNic&#x60; - regex[&#x60;^[a-zA-Z0-9_][a-zA-Z0-9_-]{2,47}$&#x60;]      Preferred network interface to use  - &#x60;StorPoolName&#x60; - regex[&#x60;^[a-zA-Z0-9_][a-zA-Z0-9_-]{2,47}$&#x60;]      Linstor storage pool name to use.  - &#x60;StorPoolNameDrbdMeta&#x60; - regex[&#x60;^|.internal|[a-zA-Z0-9_][a-zA-Z0-9_-]{2,47}$&#x60;]      Linstor storage pool name to use for external metadata.  - &#x60;sys/fs/blkio_throttle_read&#x60; - long      Sets the /sys/fs/cgroup/blkio/blkio.throttle.read_bps_device  - &#x60;sys/fs/blkio_throttle_write&#x60; - long      Sets the /sys/fs/cgroup/blkio/blkio.throttle.write_bps_device  - &#x60;sys/fs/blkio_throttle_read_iops&#x60; - long      Sets the /sys/fs/cgroup/blkio/blkio.throttle.read_iops_device  - &#x60;sys/fs/blkio_throttle_write_iops&#x60; - long      Sets the /sys/fs/cgroup/blkio/blkio.throttle.write_iops_device  - &#x60;DrbdOptions/AutoEvictAfterTime&#x60; - long      Time a node can be offline before it is declared EVICTED in minutes  - &#x60;Writecache/PoolName&#x60; - regex[&#x60;^[a-zA-Z0-9_][a-zA-Z0-9_-]{2,47}$&#x60;]      Linstor storage pool name for writecache  - &#x60;Writecache/Size&#x60; - regex[&#x60;^100%|[0-9]{1,2}([.][0-9]*)?%|[1-9][0-9]{2,}$&#x60;]      Size of the writecache in % (0-100) or KiB otherwise  - &#x60;Writecache/Options/StartSector&#x60; - long      offset from the start of cache device in 512-byte sectors  - &#x60;Writecache/Options/HighWatermark&#x60; - long      start writeback when the number of used blocks reach this watermark  - &#x60;Writecache/Options/LowWatermark&#x60; - long      stop writeback when the number of used blocks drops below this watermark  - &#x60;Writecache/Options/WritebackJobs&#x60; - long      limit the number of blocks that are in flight during writeback. Setting this value reduces writeback throughput, but it may improve latency of read requests  - &#x60;Writecache/Options/AutocommitBlocks&#x60; - long      when the application writes this amount of blocks without issuing the FLUSH request, the blocks are automatically commited  - &#x60;Writecache/Options/AutocommitTime&#x60; - long      autocommit time in milliseconds. The data is automatically commited if this time passes and no FLUSH request is received  - &#x60;Writecache/Options/Fua&#x60; - enum      \&quot;On\&quot; results in \&quot;fua\&quot; as argument, whereas the value \&quot;Off\&quot; results in \&quot;nofua\&quot; argument      * On     * Off  - &#x60;Writecache/Options/Additional&#x60; - string      Additional arguments passed through  - &#x60;Cache/OpMode&#x60; - enum      Operation mode      * writeback     * writethrough     * passthrough  - &#x60;Cache/MetaPool&#x60; - regex[&#x60;^[a-zA-Z0-9_][a-zA-Z0-9_-]{2,47}$&#x60;]      Name of the storage pool used for the cache metadata. If not specified, this will default to the CachePool property  - &#x60;Cache/Metasize&#x60; - regex[&#x60;^100%|[0-9]{1,2}([.][0-9]*)?%|[1-9][0-9]{2,}$&#x60;]      Size of the cache in % (0-100) or KiB otherwise.  - &#x60;Cache/CachePool&#x60; - regex[&#x60;^[a-zA-Z0-9_][a-zA-Z0-9_-]{2,47}$&#x60;]      Name of the storage pool used for the cache cache device  - &#x60;Cache/Cachesize&#x60; - regex[&#x60;^100%|[0-9]{1,2}([.][0-9]*)?%|[1-9][0-9]{2,}$&#x60;]      Size of the cache in % (0-100) or KiB otherwise.  - &#x60;Cache/Blocksize&#x60; - long      Block size  - &#x60;Cache/Policy&#x60; - enum      Replacemant policy      * mq     * smq     * cleaner  - &#x60;StorDriver/LvcreateOptions&#x60; - regex[&#x60;.*&#x60;]      Additional parameters added to every &#39;lvcreate ... &#39; command  - &#x60;StorDriver/ZfscreateOptions&#x60; - regex[&#x60;.*&#x60;]      Additional parameters added to every &#39;zfs create ... &#39; command  - &#x60;StorDriver/Openflex/ApiHost&#x60; - regex[&#x60;.+&#x60;]      Openflex API host name  - &#x60;StorDriver/Openflex/ApiPort&#x60; - regex[&#x60;[0-9]+&#x60;]      Openflex API port  - &#x60;StorDriver/Openflex/UserName&#x60; - regex[&#x60;.+&#x60;]      Openflex user name  - &#x60;StorDriver/Openflex/UserPassword&#x60; - regex[&#x60;.+&#x60;]      Openflex password  - &#x60;StorDriver/Openflex/StorDev&#x60; - regex[&#x60;.+&#x60;]      Openflex storage device  - &#x60;StorDriver/Openflex/StorDevHost&#x60; - regex[&#x60;.+&#x60;]      Openflex storage device host  - &#x60;StorDriver/Openflex/JobWaitDelay&#x60; - regex[&#x60;[0-9]+&#x60;]      Delay in milliseconds linstor waits between fetching the job status  - &#x60;StorDriver/Openflex/JobWaitMaxCount&#x60; - regex[&#x60;[0-9]+&#x60;]      Maximum retries with wait delay until openflex fails  - &#x60;Autoplacer/MaxThroughput&#x60; - long      The maximum throughput the given storage pool is capable of.  - &#x60;DrbdProxy/AutoEnable&#x60; - boolean_true_false - &#x60;Site&#x60; - string - &#x60;DrbdOptions/auto-diskful-allow-cleanup&#x60; - boolean_true_false      Allows this resource to be cleaned up after toggle-disk + resync is finished 
     # @param node [String] node to use
     # @param [Hash] opts the optional parameters
     # @option opts [NodeModify] :node_modify 
@@ -1786,7 +2166,7 @@ module LinstorClient
     # Lists all storage pools of a node
     # @param node [String] node to use
     # @param [Hash] opts the optional parameters
-    # @option opts [Array<String>] :nodes Filter only for the specified nodes, if not specified no filtering.
+    # @option opts [Array<String>] :nodes Filter only for the specified nodes, if not specified, no filtering.
     # @option opts [Array<String>] :storage_pools Filter only for the specified storage pools, if not specified no filtering.
     # @option opts [Integer] :offset number of records to skip for pagination
     # @option opts [Integer] :limit maximum number of records to return
@@ -1800,7 +2180,7 @@ module LinstorClient
     # Lists all storage pools of a node
     # @param node [String] node to use
     # @param [Hash] opts the optional parameters
-    # @option opts [Array<String>] :nodes Filter only for the specified nodes, if not specified no filtering.
+    # @option opts [Array<String>] :nodes Filter only for the specified nodes, if not specified, no filtering.
     # @option opts [Array<String>] :storage_pools Filter only for the specified storage pools, if not specified no filtering.
     # @option opts [Integer] :offset number of records to skip for pagination
     # @option opts [Integer] :limit maximum number of records to return
@@ -1870,7 +2250,7 @@ module LinstorClient
     end
 
     # modify a storage pool
-    # Sets or modifies properties  Possible properties are: - `StorDriver/LvmVg` - regex[`[a-zA-Z0-9_-]+`] - `StorDriver/ThinPool` - regex[`[a-zA-Z0-9_-]+`] - `StorDriver/ZPool` - regex[`[a-zA-Z0-9_/-]+`] - `StorDriver/ZPoolThin` - regex[`[a-zA-Z0-9_/-]+`] - `StorDriver/FileDir` - regex[`.*`] - `PrefNic` - regex[`^[a-zA-Z0-9_][a-zA-Z0-9_-]{2,47}$`]      Preferred network interface to use  - `NVMe/PrefNic` - regex[`^[a-zA-Z0-9_][a-zA-Z0-9_-]{2,47}$`]      Preferred network interface to use  - `StorDriver/LvcreateType` - enum     * linear     * striped     * mirror     * raid0     * raid1     * raid4     * raid5     * raid6     * raid10     * lzma     * lz4  - `StorDriver/WaitTimeoutAfterCreate` - regex[`[0-9]+`] - `sys/fs/blkio_throttle_read` - long      Sets the /sys/fs/cgroup/blkio/blkio.throttle.read_bps_device  - `sys/fs/blkio_throttle_write` - long      Sets the /sys/fs/cgroup/blkio/blkio.throttle.write_bps_device  
+    # Sets or modifies properties  Possible properties are: - `StorDriver/StorPoolName` - regex[`[a-zA-Z0-9_/-]+`] - `StorDriver/LvmVg` - regex[`[a-zA-Z0-9_-]+`] - `StorDriver/ThinPool` - regex[`[a-zA-Z0-9_-]+`] - `StorDriver/ZPool` - regex[`[a-zA-Z0-9_/-]+`] - `StorDriver/ZPoolThin` - regex[`[a-zA-Z0-9_/-]+`] - `StorDriver/FileDir` - regex[`.*`] - `PrefNic` - regex[`^[a-zA-Z0-9_][a-zA-Z0-9_-]{2,47}$`]      Preferred network interface to use  - `NVMe/PrefNic` - regex[`^[a-zA-Z0-9_][a-zA-Z0-9_-]{2,47}$`]      Preferred network interface to use  - `StorDriver/LvcreateType` - enum     * linear     * striped     * mirror     * raid0     * raid1     * raid4     * raid5     * raid6     * raid10     * lzma     * lz4  - `StorDriver/LvcreateOptions` - regex[`.*`]      Additional parameters added to every 'lvcreate ... ' command  - `StorDriver/ZfscreateOptions` - regex[`.*`]      Additional parameters added to every 'zfs create ... ' command  - `StorDriver/WaitTimeoutAfterCreate` - regex[`[0-9]+`] - `sys/fs/blkio_throttle_read` - long      Sets the /sys/fs/cgroup/blkio/blkio.throttle.read_bps_device  - `sys/fs/blkio_throttle_write` - long      Sets the /sys/fs/cgroup/blkio/blkio.throttle.write_bps_device  - `sys/fs/blkio_throttle_read_iops` - long      Sets the /sys/fs/cgroup/blkio/blkio.throttle.read_iops_device  - `sys/fs/blkio_throttle_write_iops` - long      Sets the /sys/fs/cgroup/blkio/blkio.throttle.write_iops_device  - `StorDriver/Openflex/ApiHost` - regex[`.+`]      Openflex API host name  - `StorDriver/Openflex/ApiPort` - regex[`[0-9]+`]      Openflex API port  - `StorDriver/Openflex/UserName` - regex[`.+`]      Openflex user name  - `StorDriver/Openflex/UserPassword` - regex[`.+`]      Openflex password  - `StorDriver/Openflex/StorDev` - regex[`.+`]      Openflex storage device  - `StorDriver/Openflex/StorDevHost` - regex[`.+`]      Openflex storage device host  - `StorDriver/Openflex/StorPool` - regex[`[0-9]+`]      Openflex storage pool name  - `Autoplacer/MaxThroughput` - long      The maximum throughput the given storage pool is capable of. 
     # @param node [String] node to use
     # @param storagepool [String] 
     # @param [Hash] opts the optional parameters
@@ -1882,7 +2262,7 @@ module LinstorClient
     end
 
     # modify a storage pool
-    # Sets or modifies properties  Possible properties are: - &#x60;StorDriver/LvmVg&#x60; - regex[&#x60;[a-zA-Z0-9_-]+&#x60;] - &#x60;StorDriver/ThinPool&#x60; - regex[&#x60;[a-zA-Z0-9_-]+&#x60;] - &#x60;StorDriver/ZPool&#x60; - regex[&#x60;[a-zA-Z0-9_/-]+&#x60;] - &#x60;StorDriver/ZPoolThin&#x60; - regex[&#x60;[a-zA-Z0-9_/-]+&#x60;] - &#x60;StorDriver/FileDir&#x60; - regex[&#x60;.*&#x60;] - &#x60;PrefNic&#x60; - regex[&#x60;^[a-zA-Z0-9_][a-zA-Z0-9_-]{2,47}$&#x60;]      Preferred network interface to use  - &#x60;NVMe/PrefNic&#x60; - regex[&#x60;^[a-zA-Z0-9_][a-zA-Z0-9_-]{2,47}$&#x60;]      Preferred network interface to use  - &#x60;StorDriver/LvcreateType&#x60; - enum     * linear     * striped     * mirror     * raid0     * raid1     * raid4     * raid5     * raid6     * raid10     * lzma     * lz4  - &#x60;StorDriver/WaitTimeoutAfterCreate&#x60; - regex[&#x60;[0-9]+&#x60;] - &#x60;sys/fs/blkio_throttle_read&#x60; - long      Sets the /sys/fs/cgroup/blkio/blkio.throttle.read_bps_device  - &#x60;sys/fs/blkio_throttle_write&#x60; - long      Sets the /sys/fs/cgroup/blkio/blkio.throttle.write_bps_device  
+    # Sets or modifies properties  Possible properties are: - &#x60;StorDriver/StorPoolName&#x60; - regex[&#x60;[a-zA-Z0-9_/-]+&#x60;] - &#x60;StorDriver/LvmVg&#x60; - regex[&#x60;[a-zA-Z0-9_-]+&#x60;] - &#x60;StorDriver/ThinPool&#x60; - regex[&#x60;[a-zA-Z0-9_-]+&#x60;] - &#x60;StorDriver/ZPool&#x60; - regex[&#x60;[a-zA-Z0-9_/-]+&#x60;] - &#x60;StorDriver/ZPoolThin&#x60; - regex[&#x60;[a-zA-Z0-9_/-]+&#x60;] - &#x60;StorDriver/FileDir&#x60; - regex[&#x60;.*&#x60;] - &#x60;PrefNic&#x60; - regex[&#x60;^[a-zA-Z0-9_][a-zA-Z0-9_-]{2,47}$&#x60;]      Preferred network interface to use  - &#x60;NVMe/PrefNic&#x60; - regex[&#x60;^[a-zA-Z0-9_][a-zA-Z0-9_-]{2,47}$&#x60;]      Preferred network interface to use  - &#x60;StorDriver/LvcreateType&#x60; - enum     * linear     * striped     * mirror     * raid0     * raid1     * raid4     * raid5     * raid6     * raid10     * lzma     * lz4  - &#x60;StorDriver/LvcreateOptions&#x60; - regex[&#x60;.*&#x60;]      Additional parameters added to every &#39;lvcreate ... &#39; command  - &#x60;StorDriver/ZfscreateOptions&#x60; - regex[&#x60;.*&#x60;]      Additional parameters added to every &#39;zfs create ... &#39; command  - &#x60;StorDriver/WaitTimeoutAfterCreate&#x60; - regex[&#x60;[0-9]+&#x60;] - &#x60;sys/fs/blkio_throttle_read&#x60; - long      Sets the /sys/fs/cgroup/blkio/blkio.throttle.read_bps_device  - &#x60;sys/fs/blkio_throttle_write&#x60; - long      Sets the /sys/fs/cgroup/blkio/blkio.throttle.write_bps_device  - &#x60;sys/fs/blkio_throttle_read_iops&#x60; - long      Sets the /sys/fs/cgroup/blkio/blkio.throttle.read_iops_device  - &#x60;sys/fs/blkio_throttle_write_iops&#x60; - long      Sets the /sys/fs/cgroup/blkio/blkio.throttle.write_iops_device  - &#x60;StorDriver/Openflex/ApiHost&#x60; - regex[&#x60;.+&#x60;]      Openflex API host name  - &#x60;StorDriver/Openflex/ApiPort&#x60; - regex[&#x60;[0-9]+&#x60;]      Openflex API port  - &#x60;StorDriver/Openflex/UserName&#x60; - regex[&#x60;.+&#x60;]      Openflex user name  - &#x60;StorDriver/Openflex/UserPassword&#x60; - regex[&#x60;.+&#x60;]      Openflex password  - &#x60;StorDriver/Openflex/StorDev&#x60; - regex[&#x60;.+&#x60;]      Openflex storage device  - &#x60;StorDriver/Openflex/StorDevHost&#x60; - regex[&#x60;.+&#x60;]      Openflex storage device host  - &#x60;StorDriver/Openflex/StorPool&#x60; - regex[&#x60;[0-9]+&#x60;]      Openflex storage pool name  - &#x60;Autoplacer/MaxThroughput&#x60; - long      The maximum throughput the given storage pool is capable of. 
     # @param node [String] node to use
     # @param storagepool [String] 
     # @param [Hash] opts the optional parameters
@@ -2218,7 +2598,7 @@ module LinstorClient
     end
 
     # modify a resource connection
-    # Sets or modifies properties  Possible properties are: - `DrbdOptions/PeerDevice/c-fill-target` - range[`0-1048576`] - `DrbdOptions/PeerDevice/c-max-rate` - range[`250-4194304`] - `DrbdOptions/PeerDevice/resync-rate` - range[`1-8388608`] - `DrbdOptions/PeerDevice/c-delay-target` - range[`1-100`] - `DrbdOptions/PeerDevice/c-min-rate` - range[`0-4194304`] - `DrbdOptions/PeerDevice/bitmap` - boolean - `DrbdOptions/PeerDevice/c-plan-ahead` - range[`0-300`] - `DrbdOptions/Net/max-epoch-size` - range[`1-20000`] - `DrbdOptions/Net/protocol` - enum     * A     * B     * C  - `DrbdOptions/Net/allow-two-primaries` - boolean - `DrbdOptions/Net/after-sb-0pri` - enum     * disconnect     * discard-younger-primary     * discard-older-primary     * discard-zero-changes     * discard-least-changes     * discard-local     * discard-remote  - `DrbdOptions/Net/ko-count` - range[`0-200`] - `DrbdOptions/Net/data-integrity-alg` - string - `DrbdOptions/Net/ping-timeout` - range[`1-300`] - `DrbdOptions/Net/sndbuf-size` - range[`0-10485760`] - `DrbdOptions/Net/transport` - string - `DrbdOptions/Net/rcvbuf-size` - range[`0-10485760`] - `DrbdOptions/Net/max-buffers` - range[`32-131072`] - `DrbdOptions/Net/fencing` - enum     * dont-care     * resource-only     * resource-and-stonith  - `DrbdOptions/Net/csums-alg` - string - `DrbdOptions/Net/always-asbp` - boolean - `DrbdOptions/Net/congestion-extents` - range[`67-65534`] - `DrbdOptions/Net/on-congestion` - enum     * block     * pull-ahead     * disconnect  - `DrbdOptions/Net/ping-int` - range[`1-120`] - `DrbdOptions/Net/rr-conflict` - enum     * disconnect     * call-pri-lost     * violently  - `DrbdOptions/Net/tcp-cork` - boolean - `DrbdOptions/Net/use-rle` - boolean - `DrbdOptions/Net/csums-after-crash-only` - boolean - `DrbdOptions/Net/socket-check-timeout` - range[`0-300`] - `DrbdOptions/Net/congestion-fill` - range[`0-20971520`] - `DrbdOptions/Net/cram-hmac-alg` - string - `DrbdOptions/Net/verify-alg` - string - `DrbdOptions/Net/shared-secret` - string - `DrbdOptions/Net/connect-int` - range[`1-120`] - `DrbdOptions/Net/timeout` - range[`1-600`] - `DrbdOptions/Net/after-sb-2pri` - enum     * disconnect     * call-pri-lost-after-sb     * violently-as0p  - `DrbdOptions/Net/after-sb-1pri` - enum     * disconnect     * consensus     * discard-secondary     * call-pri-lost-after-sb     * violently-as0p  
+    # Sets or modifies properties  Possible properties are: - `DrbdOptions/PeerDevice/resync-rate` - range[`1-8388608`] - `DrbdOptions/PeerDevice/c-plan-ahead` - range[`0-300`] - `DrbdOptions/PeerDevice/c-delay-target` - range[`1-100`] - `DrbdOptions/PeerDevice/c-fill-target` - range[`0-1048576`] - `DrbdOptions/PeerDevice/c-max-rate` - range[`250-4194304`] - `DrbdOptions/PeerDevice/c-min-rate` - range[`0-4194304`] - `DrbdOptions/PeerDevice/bitmap` - boolean - `DrbdOptions/Net/transport` - string - `DrbdOptions/Net/protocol` - enum     * A     * B     * C  - `DrbdOptions/Net/timeout` - range[`1-600`] - `DrbdOptions/Net/max-epoch-size` - range[`1-20000`] - `DrbdOptions/Net/connect-int` - range[`1-120`] - `DrbdOptions/Net/ping-int` - range[`1-120`] - `DrbdOptions/Net/sndbuf-size` - range[`0-10485760`] - `DrbdOptions/Net/rcvbuf-size` - range[`0-10485760`] - `DrbdOptions/Net/ko-count` - range[`0-200`] - `DrbdOptions/Net/allow-two-primaries` - boolean - `DrbdOptions/Net/cram-hmac-alg` - string - `DrbdOptions/Net/shared-secret` - string - `DrbdOptions/Net/after-sb-0pri` - enum     * disconnect     * discard-younger-primary     * discard-older-primary     * discard-zero-changes     * discard-least-changes     * discard-local     * discard-remote  - `DrbdOptions/Net/after-sb-1pri` - enum     * disconnect     * consensus     * discard-secondary     * call-pri-lost-after-sb     * violently-as0p  - `DrbdOptions/Net/after-sb-2pri` - enum     * disconnect     * call-pri-lost-after-sb     * violently-as0p  - `DrbdOptions/Net/always-asbp` - boolean - `DrbdOptions/Net/rr-conflict` - enum     * disconnect     * call-pri-lost     * violently     * retry-connect  - `DrbdOptions/Net/ping-timeout` - range[`1-300`] - `DrbdOptions/Net/data-integrity-alg` - string - `DrbdOptions/Net/tcp-cork` - boolean - `DrbdOptions/Net/on-congestion` - enum     * block     * pull-ahead     * disconnect  - `DrbdOptions/Net/congestion-fill` - range[`0-20971520`] - `DrbdOptions/Net/congestion-extents` - range[`67-65534`] - `DrbdOptions/Net/csums-alg` - string - `DrbdOptions/Net/csums-after-crash-only` - boolean - `DrbdOptions/Net/verify-alg` - string - `DrbdOptions/Net/use-rle` - boolean - `DrbdOptions/Net/socket-check-timeout` - range[`0-300`] - `DrbdOptions/Net/fencing` - enum     * dont-care     * resource-only     * resource-and-stonith  - `DrbdOptions/Net/max-buffers` - range[`32-131072`] - `DrbdOptions/Net/allow-remote-read` - boolean 
     # @param resource [String] resource to use
     # @param node_a [String] source node of the connection
     # @param node_b [String] target node of the connection
@@ -2231,7 +2611,7 @@ module LinstorClient
     end
 
     # modify a resource connection
-    # Sets or modifies properties  Possible properties are: - &#x60;DrbdOptions/PeerDevice/c-fill-target&#x60; - range[&#x60;0-1048576&#x60;] - &#x60;DrbdOptions/PeerDevice/c-max-rate&#x60; - range[&#x60;250-4194304&#x60;] - &#x60;DrbdOptions/PeerDevice/resync-rate&#x60; - range[&#x60;1-8388608&#x60;] - &#x60;DrbdOptions/PeerDevice/c-delay-target&#x60; - range[&#x60;1-100&#x60;] - &#x60;DrbdOptions/PeerDevice/c-min-rate&#x60; - range[&#x60;0-4194304&#x60;] - &#x60;DrbdOptions/PeerDevice/bitmap&#x60; - boolean - &#x60;DrbdOptions/PeerDevice/c-plan-ahead&#x60; - range[&#x60;0-300&#x60;] - &#x60;DrbdOptions/Net/max-epoch-size&#x60; - range[&#x60;1-20000&#x60;] - &#x60;DrbdOptions/Net/protocol&#x60; - enum     * A     * B     * C  - &#x60;DrbdOptions/Net/allow-two-primaries&#x60; - boolean - &#x60;DrbdOptions/Net/after-sb-0pri&#x60; - enum     * disconnect     * discard-younger-primary     * discard-older-primary     * discard-zero-changes     * discard-least-changes     * discard-local     * discard-remote  - &#x60;DrbdOptions/Net/ko-count&#x60; - range[&#x60;0-200&#x60;] - &#x60;DrbdOptions/Net/data-integrity-alg&#x60; - string - &#x60;DrbdOptions/Net/ping-timeout&#x60; - range[&#x60;1-300&#x60;] - &#x60;DrbdOptions/Net/sndbuf-size&#x60; - range[&#x60;0-10485760&#x60;] - &#x60;DrbdOptions/Net/transport&#x60; - string - &#x60;DrbdOptions/Net/rcvbuf-size&#x60; - range[&#x60;0-10485760&#x60;] - &#x60;DrbdOptions/Net/max-buffers&#x60; - range[&#x60;32-131072&#x60;] - &#x60;DrbdOptions/Net/fencing&#x60; - enum     * dont-care     * resource-only     * resource-and-stonith  - &#x60;DrbdOptions/Net/csums-alg&#x60; - string - &#x60;DrbdOptions/Net/always-asbp&#x60; - boolean - &#x60;DrbdOptions/Net/congestion-extents&#x60; - range[&#x60;67-65534&#x60;] - &#x60;DrbdOptions/Net/on-congestion&#x60; - enum     * block     * pull-ahead     * disconnect  - &#x60;DrbdOptions/Net/ping-int&#x60; - range[&#x60;1-120&#x60;] - &#x60;DrbdOptions/Net/rr-conflict&#x60; - enum     * disconnect     * call-pri-lost     * violently  - &#x60;DrbdOptions/Net/tcp-cork&#x60; - boolean - &#x60;DrbdOptions/Net/use-rle&#x60; - boolean - &#x60;DrbdOptions/Net/csums-after-crash-only&#x60; - boolean - &#x60;DrbdOptions/Net/socket-check-timeout&#x60; - range[&#x60;0-300&#x60;] - &#x60;DrbdOptions/Net/congestion-fill&#x60; - range[&#x60;0-20971520&#x60;] - &#x60;DrbdOptions/Net/cram-hmac-alg&#x60; - string - &#x60;DrbdOptions/Net/verify-alg&#x60; - string - &#x60;DrbdOptions/Net/shared-secret&#x60; - string - &#x60;DrbdOptions/Net/connect-int&#x60; - range[&#x60;1-120&#x60;] - &#x60;DrbdOptions/Net/timeout&#x60; - range[&#x60;1-600&#x60;] - &#x60;DrbdOptions/Net/after-sb-2pri&#x60; - enum     * disconnect     * call-pri-lost-after-sb     * violently-as0p  - &#x60;DrbdOptions/Net/after-sb-1pri&#x60; - enum     * disconnect     * consensus     * discard-secondary     * call-pri-lost-after-sb     * violently-as0p  
+    # Sets or modifies properties  Possible properties are: - &#x60;DrbdOptions/PeerDevice/resync-rate&#x60; - range[&#x60;1-8388608&#x60;] - &#x60;DrbdOptions/PeerDevice/c-plan-ahead&#x60; - range[&#x60;0-300&#x60;] - &#x60;DrbdOptions/PeerDevice/c-delay-target&#x60; - range[&#x60;1-100&#x60;] - &#x60;DrbdOptions/PeerDevice/c-fill-target&#x60; - range[&#x60;0-1048576&#x60;] - &#x60;DrbdOptions/PeerDevice/c-max-rate&#x60; - range[&#x60;250-4194304&#x60;] - &#x60;DrbdOptions/PeerDevice/c-min-rate&#x60; - range[&#x60;0-4194304&#x60;] - &#x60;DrbdOptions/PeerDevice/bitmap&#x60; - boolean - &#x60;DrbdOptions/Net/transport&#x60; - string - &#x60;DrbdOptions/Net/protocol&#x60; - enum     * A     * B     * C  - &#x60;DrbdOptions/Net/timeout&#x60; - range[&#x60;1-600&#x60;] - &#x60;DrbdOptions/Net/max-epoch-size&#x60; - range[&#x60;1-20000&#x60;] - &#x60;DrbdOptions/Net/connect-int&#x60; - range[&#x60;1-120&#x60;] - &#x60;DrbdOptions/Net/ping-int&#x60; - range[&#x60;1-120&#x60;] - &#x60;DrbdOptions/Net/sndbuf-size&#x60; - range[&#x60;0-10485760&#x60;] - &#x60;DrbdOptions/Net/rcvbuf-size&#x60; - range[&#x60;0-10485760&#x60;] - &#x60;DrbdOptions/Net/ko-count&#x60; - range[&#x60;0-200&#x60;] - &#x60;DrbdOptions/Net/allow-two-primaries&#x60; - boolean - &#x60;DrbdOptions/Net/cram-hmac-alg&#x60; - string - &#x60;DrbdOptions/Net/shared-secret&#x60; - string - &#x60;DrbdOptions/Net/after-sb-0pri&#x60; - enum     * disconnect     * discard-younger-primary     * discard-older-primary     * discard-zero-changes     * discard-least-changes     * discard-local     * discard-remote  - &#x60;DrbdOptions/Net/after-sb-1pri&#x60; - enum     * disconnect     * consensus     * discard-secondary     * call-pri-lost-after-sb     * violently-as0p  - &#x60;DrbdOptions/Net/after-sb-2pri&#x60; - enum     * disconnect     * call-pri-lost-after-sb     * violently-as0p  - &#x60;DrbdOptions/Net/always-asbp&#x60; - boolean - &#x60;DrbdOptions/Net/rr-conflict&#x60; - enum     * disconnect     * call-pri-lost     * violently     * retry-connect  - &#x60;DrbdOptions/Net/ping-timeout&#x60; - range[&#x60;1-300&#x60;] - &#x60;DrbdOptions/Net/data-integrity-alg&#x60; - string - &#x60;DrbdOptions/Net/tcp-cork&#x60; - boolean - &#x60;DrbdOptions/Net/on-congestion&#x60; - enum     * block     * pull-ahead     * disconnect  - &#x60;DrbdOptions/Net/congestion-fill&#x60; - range[&#x60;0-20971520&#x60;] - &#x60;DrbdOptions/Net/congestion-extents&#x60; - range[&#x60;67-65534&#x60;] - &#x60;DrbdOptions/Net/csums-alg&#x60; - string - &#x60;DrbdOptions/Net/csums-after-crash-only&#x60; - boolean - &#x60;DrbdOptions/Net/verify-alg&#x60; - string - &#x60;DrbdOptions/Net/use-rle&#x60; - boolean - &#x60;DrbdOptions/Net/socket-check-timeout&#x60; - range[&#x60;0-300&#x60;] - &#x60;DrbdOptions/Net/fencing&#x60; - enum     * dont-care     * resource-only     * resource-and-stonith  - &#x60;DrbdOptions/Net/max-buffers&#x60; - range[&#x60;32-131072&#x60;] - &#x60;DrbdOptions/Net/allow-remote-read&#x60; - boolean 
     # @param resource [String] resource to use
     # @param node_a [String] source node of the connection
     # @param node_b [String] target node of the connection
@@ -2639,6 +3019,7 @@ module LinstorClient
     # Lists all resource definitions.  A single resource definition can be queried by adding its name to the resource string like:  /v1/resource-definitions/rsc1 
     # @param [Hash] opts the optional parameters
     # @option opts [Array<String>] :resource_definitions Filter only for the specified resource definitions, if not specified no filtering.
+    # @option opts [Array<String>] :props filter by given properties, full property path
     # @option opts [Integer] :offset number of records to skip for pagination
     # @option opts [Integer] :limit maximum number of records to return
     # @return [Array<ResourceDefinition>]
@@ -2651,6 +3032,7 @@ module LinstorClient
     # Lists all resource definitions.  A single resource definition can be queried by adding its name to the resource string like:  /v1/resource-definitions/rsc1 
     # @param [Hash] opts the optional parameters
     # @option opts [Array<String>] :resource_definitions Filter only for the specified resource definitions, if not specified no filtering.
+    # @option opts [Array<String>] :props filter by given properties, full property path
     # @option opts [Integer] :offset number of records to skip for pagination
     # @option opts [Integer] :limit maximum number of records to return
     # @return [Array<(Array<ResourceDefinition>, Integer, Hash)>] Array<ResourceDefinition> data, response status code and response headers
@@ -2676,6 +3058,7 @@ module LinstorClient
       # query parameters
       query_params = opts[:query_params] || {}
       query_params[:'resource_definitions'] = @api_client.build_collection_param(opts[:'resource_definitions'], :multi) if !opts[:'resource_definitions'].nil?
+      query_params[:'props'] = @api_client.build_collection_param(opts[:'props'], :multi) if !opts[:'props'].nil?
       query_params[:'offset'] = opts[:'offset'] if !opts[:'offset'].nil?
       query_params[:'limit'] = opts[:'limit'] if !opts[:'limit'].nil?
 
@@ -2714,7 +3097,7 @@ module LinstorClient
     end
 
     # modify a resource-definition
-    # Sets or modifies properties  Possible properties are: - `StorPoolName` - regex[`^[a-zA-Z0-9_][a-zA-Z0-9_-]{2,47}$`]      Linstor storage pool name to use.  - `StorPoolNameDrbdMeta` - regex[`^|.internal|[a-zA-Z0-9_][a-zA-Z0-9_-]{2,47}$`]      Linstor storage pool name to use.  - `DrbdMetaType` - enum     * external     * internal  - `PeerSlotsNewResource` - range[`1-31`]      DRBD peer slots to allocate for newly created resources (default 7), the number of peer slots cannot be changed once the resource is created, so allow sufficient slots to increase redundancy in the future  - `DrbdProxy/CompressionType` - enum     * zlib     * lzma     * lz4     * zstd  - `FileSystem/Type` - enum      File system type to use      * ext4     * xfs  - `FileSystem/MkfsParams` - string      Additional parameters for the mkfs command  - `NVMe/enabled` - enum     * rdma     * tcp  - `NVMe/enabled` - range[`1-65535`] - `StorDriver/LvcreateType` - enum     * linear     * striped     * mirror     * raid0     * raid1     * raid4     * raid5     * raid6     * raid10     * lzma     * lz4  - `sys/fs/blkio_throttle_read` - long      Sets the /sys/fs/cgroup/blkio/blkio.throttle.read_bps_device  - `sys/fs/blkio_throttle_write` - long      Sets the /sys/fs/cgroup/blkio/blkio.throttle.write_bps_device  - `DrbdOptions/auto-quorum` - enum      Enables automatic setting of the 'quroum' and 'on-no-quroum' property      * io-error     * suspend-io     * disabled  - `DrbdOptions/auto-add-quorum-tiebreaker` - boolean_true_false      Enables automatic management (creation and deletion) of tie breaking resource  - `Writecache/PoolName` - regex[`^[a-zA-Z0-9_][a-zA-Z0-9_-]{2,47}$`]      Linstor storage pool name for writecache  - `Writecache/Size` - regex[`^100%|[0-9]{1,2}([.][0-9]*)?%|[1-9][0-9]{2,}$`]      Size of the writecache in % (0-100) or KiB otherwise  - `Writecache/Blocksize` - long      4096 is recommended; the maximum block size is the page size  - `Writecache/Options/StartSector` - long      offset from the start of cache device in 512-byte sectors  - `Writecache/Options/HighWatermark` - long      start writeback when the number of used blocks reach this watermark  - `Writecache/Options/LowWatermark` - long      stop writeback when the number of used blocks drops below this watermark  - `Writecache/Options/WritebackJobs` - long      limit the number of blocks that are in flight during writeback. Setting this value reduces writeback throughput, but it may improve latency of read requests  - `Writecache/Options/AutocommitBlocks` - long      when the application writes this amount of blocks without issuing the FLUSH request, the blocks are automatically commited  - `Writecache/Options/AutocommitTime` - long      autocommit time in milliseconds. The data is automatically commited if this time passes and no FLUSH request is received  - `Writecache/Options/Fua` - enum      \"On\" results in \"fua\" as argument, whereas the value \"Off\" results in \"nofua\" argument      * On     * Off  - `Writecache/Options/Additional` - string      Additional arguments passed through  - `DrbdOptions/Disk/read-balancing` - enum     * prefer-local     * prefer-remote     * round-robin     * least-pending     * when-congested-remote     * 32K-striping     * 64K-striping     * 128K-striping     * 256K-striping     * 512K-striping     * 1M-striping  - `DrbdOptions/Disk/on-io-error` - enum     * pass_on     * call-local-io-error     * detach  - `DrbdOptions/Disk/disk-drain` - boolean - `DrbdOptions/Disk/resync-after` - string - `DrbdOptions/Disk/disk-timeout` - range[`0-6000`] - `DrbdOptions/Disk/disable-write-same` - boolean - `DrbdOptions/Disk/rs-discard-granularity` - range[`0-1048576`] - `DrbdOptions/Disk/disk-flushes` - boolean - `DrbdOptions/Disk/al-extents` - range[`67-65534`] - `DrbdOptions/Disk/al-updates` - boolean - `DrbdOptions/Disk/md-flushes` - boolean - `DrbdOptions/Disk/disk-barrier` - boolean - `DrbdOptions/Disk/discard-zeroes-if-aligned` - boolean - `DrbdOptions/PeerDevice/c-fill-target` - range[`0-1048576`] - `DrbdOptions/PeerDevice/c-max-rate` - range[`250-4194304`] - `DrbdOptions/PeerDevice/resync-rate` - range[`1-8388608`] - `DrbdOptions/PeerDevice/c-delay-target` - range[`1-100`] - `DrbdOptions/PeerDevice/c-min-rate` - range[`0-4194304`] - `DrbdOptions/PeerDevice/bitmap` - boolean - `DrbdOptions/PeerDevice/c-plan-ahead` - range[`0-300`] - `DrbdOptions/Resource/peer-ack-delay` - range[`1-10000`] - `DrbdOptions/Resource/quorum-minimum-redundancy` - enum [`1-32`]     * off     * majority     * all  - `DrbdOptions/Resource/max-io-depth` - range[`4-4294967295`] - `DrbdOptions/Resource/auto-promote-timeout` - range[`0-600`] - `DrbdOptions/Resource/quorum` - enum [`1-32`]     * off     * majority     * all  - `DrbdOptions/Resource/on-no-data-accessible` - enum     * io-error     * suspend-io  - `DrbdOptions/Resource/auto-promote` - boolean - `DrbdOptions/Resource/cpu-mask` - string - `DrbdOptions/Resource/twopc-timeout` - range[`50-600`] - `DrbdOptions/Resource/twopc-retry-timeout` - range[`1-50`] - `DrbdOptions/Resource/peer-ack-window` - range[`2048-204800`] - `DrbdOptions/Resource/on-no-quorum` - enum     * io-error     * suspend-io  - `DrbdOptions/Net/max-epoch-size` - range[`1-20000`] - `DrbdOptions/Net/protocol` - enum     * A     * B     * C  - `DrbdOptions/Net/allow-two-primaries` - boolean - `DrbdOptions/Net/after-sb-0pri` - enum     * disconnect     * discard-younger-primary     * discard-older-primary     * discard-zero-changes     * discard-least-changes     * discard-local     * discard-remote  - `DrbdOptions/Net/ko-count` - range[`0-200`] - `DrbdOptions/Net/data-integrity-alg` - string - `DrbdOptions/Net/ping-timeout` - range[`1-300`] - `DrbdOptions/Net/sndbuf-size` - range[`0-10485760`] - `DrbdOptions/Net/transport` - string - `DrbdOptions/Net/rcvbuf-size` - range[`0-10485760`] - `DrbdOptions/Net/max-buffers` - range[`32-131072`] - `DrbdOptions/Net/fencing` - enum     * dont-care     * resource-only     * resource-and-stonith  - `DrbdOptions/Net/csums-alg` - string - `DrbdOptions/Net/always-asbp` - boolean - `DrbdOptions/Net/congestion-extents` - range[`67-65534`] - `DrbdOptions/Net/on-congestion` - enum     * block     * pull-ahead     * disconnect  - `DrbdOptions/Net/ping-int` - range[`1-120`] - `DrbdOptions/Net/rr-conflict` - enum     * disconnect     * call-pri-lost     * violently  - `DrbdOptions/Net/tcp-cork` - boolean - `DrbdOptions/Net/use-rle` - boolean - `DrbdOptions/Net/csums-after-crash-only` - boolean - `DrbdOptions/Net/socket-check-timeout` - range[`0-300`] - `DrbdOptions/Net/congestion-fill` - range[`0-20971520`] - `DrbdOptions/Net/cram-hmac-alg` - string - `DrbdOptions/Net/verify-alg` - string - `DrbdOptions/Net/shared-secret` - string - `DrbdOptions/Net/connect-int` - range[`1-120`] - `DrbdOptions/Net/timeout` - range[`1-600`] - `DrbdOptions/Net/after-sb-2pri` - enum     * disconnect     * call-pri-lost-after-sb     * violently-as0p  - `DrbdOptions/Net/after-sb-1pri` - enum     * disconnect     * consensus     * discard-secondary     * call-pri-lost-after-sb     * violently-as0p  - `DrbdOptions/Handlers/after-resync-target` - string - `DrbdOptions/Handlers/before-resync-target` - string - `DrbdOptions/Handlers/before-resync-source` - string - `DrbdOptions/Handlers/out-of-sync` - string - `DrbdOptions/Handlers/quorum-lost` - string - `DrbdOptions/Handlers/fence-peer` - string - `DrbdOptions/Handlers/unfence-peer` - string - `DrbdOptions/Handlers/initial-split-brain` - string - `DrbdOptions/Handlers/local-io-error` - string - `DrbdOptions/Handlers/pri-lost` - string - `DrbdOptions/Handlers/pri-lost-after-sb` - string - `DrbdOptions/Handlers/pri-on-incon-degr` - string - `DrbdOptions/Handlers/split-brain` - string 
+    # Sets or modifies properties  Possible properties are: - `StorPoolName` - regex[`^[a-zA-Z0-9_][a-zA-Z0-9_-]{2,47}$`]      Linstor storage pool name to use.  - `StorPoolNameDrbdMeta` - regex[`^|.internal|[a-zA-Z0-9_][a-zA-Z0-9_-]{2,47}$`]      Linstor storage pool name to use for external metadata.  - `PeerSlotsNewResource` - range[`1-31`]      DRBD peer slots to allocate for newly created resources (default 7), the number of peer slots cannot be changed once the resource is created, so allow sufficient slots to increase redundancy in the future  - `DrbdProxy/CompressionType` - enum     * zlib     * lzma     * lz4     * zstd  - `DrbdOptions/AutoEvictMinReplicaCount` - long      The minimum amount of replicas that should be present for a resource at all times.  - `FileSystem/Type` - enum      File system type to use      * ext4     * xfs  - `FileSystem/MkfsParams` - string      Additional parameters for the mkfs command  - `NVMe/TRType` - enum      NVMe transportion type      * rdma     * tcp  - `NVMe/Port` - range[`1-65535`]      NVMe port  - `StorDriver/LvcreateType` - enum     * linear     * striped     * mirror     * raid0     * raid1     * raid4     * raid5     * raid6     * raid10     * lzma     * lz4  - `StorDriver/LvcreateOptions` - regex[`.*`]      Additional parameters added to every 'lvcreate ... ' command  - `StorDriver/ZfscreateOptions` - regex[`.*`]      Additional parameters added to every 'zfs create ... ' command  - `sys/fs/blkio_throttle_read` - long      Sets the /sys/fs/cgroup/blkio/blkio.throttle.read_bps_device  - `sys/fs/blkio_throttle_write` - long      Sets the /sys/fs/cgroup/blkio/blkio.throttle.write_bps_device  - `sys/fs/blkio_throttle_read_iops` - long      Sets the /sys/fs/cgroup/blkio/blkio.throttle.read_iops_device  - `sys/fs/blkio_throttle_write_iops` - long      Sets the /sys/fs/cgroup/blkio/blkio.throttle.write_iops_device  - `DrbdOptions/auto-quorum` - enum      Enables automatic setting of the 'quroum' and 'on-no-quroum' property      * io-error     * suspend-io     * disabled  - `DrbdOptions/auto-add-quorum-tiebreaker` - boolean_true_false      Enables automatic management (creation and deletion) of tie breaking resource  - `DrbdOptions/auto-diskful` - long      Makes a resource diskful if it was continously diskless primary for X minutes  - `DrbdOptions/auto-diskful-allow-cleanup` - boolean_true_false      Allows this resource to be cleaned up after toggle-disk + resync is finished  - `Writecache/PoolName` - regex[`^[a-zA-Z0-9_][a-zA-Z0-9_-]{2,47}$`]      Linstor storage pool name for writecache  - `Writecache/Size` - regex[`^100%|[0-9]{1,2}([.][0-9]*)?%|[1-9][0-9]{2,}$`]      Size of the writecache in % (0-100) or KiB otherwise  - `Writecache/Options/StartSector` - long      offset from the start of cache device in 512-byte sectors  - `Writecache/Options/HighWatermark` - long      start writeback when the number of used blocks reach this watermark  - `Writecache/Options/LowWatermark` - long      stop writeback when the number of used blocks drops below this watermark  - `Writecache/Options/WritebackJobs` - long      limit the number of blocks that are in flight during writeback. Setting this value reduces writeback throughput, but it may improve latency of read requests  - `Writecache/Options/AutocommitBlocks` - long      when the application writes this amount of blocks without issuing the FLUSH request, the blocks are automatically commited  - `Writecache/Options/AutocommitTime` - long      autocommit time in milliseconds. The data is automatically commited if this time passes and no FLUSH request is received  - `Writecache/Options/Fua` - enum      \"On\" results in \"fua\" as argument, whereas the value \"Off\" results in \"nofua\" argument      * On     * Off  - `Writecache/Options/Additional` - string      Additional arguments passed through  - `Cache/OpMode` - enum      Operation mode      * writeback     * writethrough     * passthrough  - `Cache/MetaPool` - regex[`^[a-zA-Z0-9_][a-zA-Z0-9_-]{2,47}$`]      Name of the storage pool used for the cache metadata. If not specified, this will default to the CachePool property  - `Cache/Metasize` - regex[`^100%|[0-9]{1,2}([.][0-9]*)?%|[1-9][0-9]{2,}$`]      Size of the cache in % (0-100) or KiB otherwise.  - `Cache/CachePool` - regex[`^[a-zA-Z0-9_][a-zA-Z0-9_-]{2,47}$`]      Name of the storage pool used for the cache cache device  - `Cache/Cachesize` - regex[`^100%|[0-9]{1,2}([.][0-9]*)?%|[1-9][0-9]{2,}$`]      Size of the cache in % (0-100) or KiB otherwise.  - `Cache/Blocksize` - long      Block size  - `Cache/Policy` - enum      Replacemant policy      * mq     * smq     * cleaner  - `SnapshotShipping/SourceNode` - string      Node name of the snapshot shipping source  - `SnapshotShipping/TargetNode` - string      Node name of the snapshot shipping target  - `SnapshotShipping/RunEvery` - long      Runs every X minutes an auto-snapshot-shipping unless the current snapshot-shipping is still running. In this case a new one will be started asap.  - `SnapshotShipping/Keep` - long      Keeps the last X sihpped snapshots. Removing this property or having a value <= 0 disables auto-cleanup, all auto-snapshots will be kept  - `AutoSnapshot/RunEvery` - long      Runs every X minutes an snapshot-creation. Removing this property or having a value <= 0 disables auto-snapshotting.  - `AutoSnapshot/Keep` - long      Keeps the last X auto-snapshots. Removing this property or having a value <= 0 disables auto-cleanup, all auto-snapshots will be kept  - `AutoSnapshot/NextAutoId` - long      The next ID to try for auto-snapshots  - `DrbdOptions/Disk/on-io-error` - enum     * pass_on     * call-local-io-error     * detach  - `DrbdOptions/Disk/disk-barrier` - boolean - `DrbdOptions/Disk/disk-flushes` - boolean - `DrbdOptions/Disk/disk-drain` - boolean - `DrbdOptions/Disk/md-flushes` - boolean - `DrbdOptions/Disk/resync-after` - string - `DrbdOptions/Disk/al-extents` - range[`67-65534`] - `DrbdOptions/Disk/al-updates` - boolean - `DrbdOptions/Disk/discard-zeroes-if-aligned` - boolean - `DrbdOptions/Disk/disable-write-same` - boolean - `DrbdOptions/Disk/disk-timeout` - range[`0-6000`] - `DrbdOptions/Disk/read-balancing` - enum     * prefer-local     * prefer-remote     * round-robin     * least-pending     * when-congested-remote     * 32K-striping     * 64K-striping     * 128K-striping     * 256K-striping     * 512K-striping     * 1M-striping  - `DrbdOptions/Disk/rs-discard-granularity` - range[`0-1048576`] - `DrbdOptions/PeerDevice/resync-rate` - range[`1-8388608`] - `DrbdOptions/PeerDevice/c-plan-ahead` - range[`0-300`] - `DrbdOptions/PeerDevice/c-delay-target` - range[`1-100`] - `DrbdOptions/PeerDevice/c-fill-target` - range[`0-1048576`] - `DrbdOptions/PeerDevice/c-max-rate` - range[`250-4194304`] - `DrbdOptions/PeerDevice/c-min-rate` - range[`0-4194304`] - `DrbdOptions/PeerDevice/bitmap` - boolean - `DrbdOptions/Resource/cpu-mask` - string - `DrbdOptions/Resource/on-no-data-accessible` - enum     * io-error     * suspend-io  - `DrbdOptions/Resource/auto-promote` - boolean - `DrbdOptions/Resource/peer-ack-window` - range[`2048-204800`] - `DrbdOptions/Resource/peer-ack-delay` - range[`1-10000`] - `DrbdOptions/Resource/twopc-timeout` - range[`50-600`] - `DrbdOptions/Resource/twopc-retry-timeout` - range[`1-50`] - `DrbdOptions/Resource/auto-promote-timeout` - range[`0-600`] - `DrbdOptions/Resource/max-io-depth` - range[`4-4294967295`] - `DrbdOptions/Resource/quorum` - enum [`1-32`]     * off     * majority     * all  - `DrbdOptions/Resource/on-no-quorum` - enum     * io-error     * suspend-io  - `DrbdOptions/Resource/quorum-minimum-redundancy` - enum [`1-32`]     * off     * majority     * all  - `DrbdOptions/Net/transport` - string - `DrbdOptions/Net/protocol` - enum     * A     * B     * C  - `DrbdOptions/Net/timeout` - range[`1-600`] - `DrbdOptions/Net/max-epoch-size` - range[`1-20000`] - `DrbdOptions/Net/connect-int` - range[`1-120`] - `DrbdOptions/Net/ping-int` - range[`1-120`] - `DrbdOptions/Net/sndbuf-size` - range[`0-10485760`] - `DrbdOptions/Net/rcvbuf-size` - range[`0-10485760`] - `DrbdOptions/Net/ko-count` - range[`0-200`] - `DrbdOptions/Net/allow-two-primaries` - boolean - `DrbdOptions/Net/cram-hmac-alg` - string - `DrbdOptions/Net/shared-secret` - string - `DrbdOptions/Net/after-sb-0pri` - enum     * disconnect     * discard-younger-primary     * discard-older-primary     * discard-zero-changes     * discard-least-changes     * discard-local     * discard-remote  - `DrbdOptions/Net/after-sb-1pri` - enum     * disconnect     * consensus     * discard-secondary     * call-pri-lost-after-sb     * violently-as0p  - `DrbdOptions/Net/after-sb-2pri` - enum     * disconnect     * call-pri-lost-after-sb     * violently-as0p  - `DrbdOptions/Net/always-asbp` - boolean - `DrbdOptions/Net/rr-conflict` - enum     * disconnect     * call-pri-lost     * violently     * retry-connect  - `DrbdOptions/Net/ping-timeout` - range[`1-300`] - `DrbdOptions/Net/data-integrity-alg` - string - `DrbdOptions/Net/tcp-cork` - boolean - `DrbdOptions/Net/on-congestion` - enum     * block     * pull-ahead     * disconnect  - `DrbdOptions/Net/congestion-fill` - range[`0-20971520`] - `DrbdOptions/Net/congestion-extents` - range[`67-65534`] - `DrbdOptions/Net/csums-alg` - string - `DrbdOptions/Net/csums-after-crash-only` - boolean - `DrbdOptions/Net/verify-alg` - string - `DrbdOptions/Net/use-rle` - boolean - `DrbdOptions/Net/socket-check-timeout` - range[`0-300`] - `DrbdOptions/Net/fencing` - enum     * dont-care     * resource-only     * resource-and-stonith  - `DrbdOptions/Net/max-buffers` - range[`32-131072`] - `DrbdOptions/Net/allow-remote-read` - boolean - `DrbdOptions/Handlers/after-resync-target` - string - `DrbdOptions/Handlers/before-resync-target` - string - `DrbdOptions/Handlers/before-resync-source` - string - `DrbdOptions/Handlers/out-of-sync` - string - `DrbdOptions/Handlers/quorum-lost` - string - `DrbdOptions/Handlers/fence-peer` - string - `DrbdOptions/Handlers/unfence-peer` - string - `DrbdOptions/Handlers/initial-split-brain` - string - `DrbdOptions/Handlers/local-io-error` - string - `DrbdOptions/Handlers/pri-lost` - string - `DrbdOptions/Handlers/pri-lost-after-sb` - string - `DrbdOptions/Handlers/pri-on-incon-degr` - string - `DrbdOptions/Handlers/split-brain` - string 
     # @param resource [String] resource to use
     # @param [Hash] opts the optional parameters
     # @option opts [ResourceDefinitionModify] :resource_definition_modify 
@@ -2725,7 +3108,7 @@ module LinstorClient
     end
 
     # modify a resource-definition
-    # Sets or modifies properties  Possible properties are: - &#x60;StorPoolName&#x60; - regex[&#x60;^[a-zA-Z0-9_][a-zA-Z0-9_-]{2,47}$&#x60;]      Linstor storage pool name to use.  - &#x60;StorPoolNameDrbdMeta&#x60; - regex[&#x60;^|.internal|[a-zA-Z0-9_][a-zA-Z0-9_-]{2,47}$&#x60;]      Linstor storage pool name to use.  - &#x60;DrbdMetaType&#x60; - enum     * external     * internal  - &#x60;PeerSlotsNewResource&#x60; - range[&#x60;1-31&#x60;]      DRBD peer slots to allocate for newly created resources (default 7), the number of peer slots cannot be changed once the resource is created, so allow sufficient slots to increase redundancy in the future  - &#x60;DrbdProxy/CompressionType&#x60; - enum     * zlib     * lzma     * lz4     * zstd  - &#x60;FileSystem/Type&#x60; - enum      File system type to use      * ext4     * xfs  - &#x60;FileSystem/MkfsParams&#x60; - string      Additional parameters for the mkfs command  - &#x60;NVMe/enabled&#x60; - enum     * rdma     * tcp  - &#x60;NVMe/enabled&#x60; - range[&#x60;1-65535&#x60;] - &#x60;StorDriver/LvcreateType&#x60; - enum     * linear     * striped     * mirror     * raid0     * raid1     * raid4     * raid5     * raid6     * raid10     * lzma     * lz4  - &#x60;sys/fs/blkio_throttle_read&#x60; - long      Sets the /sys/fs/cgroup/blkio/blkio.throttle.read_bps_device  - &#x60;sys/fs/blkio_throttle_write&#x60; - long      Sets the /sys/fs/cgroup/blkio/blkio.throttle.write_bps_device  - &#x60;DrbdOptions/auto-quorum&#x60; - enum      Enables automatic setting of the &#39;quroum&#39; and &#39;on-no-quroum&#39; property      * io-error     * suspend-io     * disabled  - &#x60;DrbdOptions/auto-add-quorum-tiebreaker&#x60; - boolean_true_false      Enables automatic management (creation and deletion) of tie breaking resource  - &#x60;Writecache/PoolName&#x60; - regex[&#x60;^[a-zA-Z0-9_][a-zA-Z0-9_-]{2,47}$&#x60;]      Linstor storage pool name for writecache  - &#x60;Writecache/Size&#x60; - regex[&#x60;^100%|[0-9]{1,2}([.][0-9]*)?%|[1-9][0-9]{2,}$&#x60;]      Size of the writecache in % (0-100) or KiB otherwise  - &#x60;Writecache/Blocksize&#x60; - long      4096 is recommended; the maximum block size is the page size  - &#x60;Writecache/Options/StartSector&#x60; - long      offset from the start of cache device in 512-byte sectors  - &#x60;Writecache/Options/HighWatermark&#x60; - long      start writeback when the number of used blocks reach this watermark  - &#x60;Writecache/Options/LowWatermark&#x60; - long      stop writeback when the number of used blocks drops below this watermark  - &#x60;Writecache/Options/WritebackJobs&#x60; - long      limit the number of blocks that are in flight during writeback. Setting this value reduces writeback throughput, but it may improve latency of read requests  - &#x60;Writecache/Options/AutocommitBlocks&#x60; - long      when the application writes this amount of blocks without issuing the FLUSH request, the blocks are automatically commited  - &#x60;Writecache/Options/AutocommitTime&#x60; - long      autocommit time in milliseconds. The data is automatically commited if this time passes and no FLUSH request is received  - &#x60;Writecache/Options/Fua&#x60; - enum      \&quot;On\&quot; results in \&quot;fua\&quot; as argument, whereas the value \&quot;Off\&quot; results in \&quot;nofua\&quot; argument      * On     * Off  - &#x60;Writecache/Options/Additional&#x60; - string      Additional arguments passed through  - &#x60;DrbdOptions/Disk/read-balancing&#x60; - enum     * prefer-local     * prefer-remote     * round-robin     * least-pending     * when-congested-remote     * 32K-striping     * 64K-striping     * 128K-striping     * 256K-striping     * 512K-striping     * 1M-striping  - &#x60;DrbdOptions/Disk/on-io-error&#x60; - enum     * pass_on     * call-local-io-error     * detach  - &#x60;DrbdOptions/Disk/disk-drain&#x60; - boolean - &#x60;DrbdOptions/Disk/resync-after&#x60; - string - &#x60;DrbdOptions/Disk/disk-timeout&#x60; - range[&#x60;0-6000&#x60;] - &#x60;DrbdOptions/Disk/disable-write-same&#x60; - boolean - &#x60;DrbdOptions/Disk/rs-discard-granularity&#x60; - range[&#x60;0-1048576&#x60;] - &#x60;DrbdOptions/Disk/disk-flushes&#x60; - boolean - &#x60;DrbdOptions/Disk/al-extents&#x60; - range[&#x60;67-65534&#x60;] - &#x60;DrbdOptions/Disk/al-updates&#x60; - boolean - &#x60;DrbdOptions/Disk/md-flushes&#x60; - boolean - &#x60;DrbdOptions/Disk/disk-barrier&#x60; - boolean - &#x60;DrbdOptions/Disk/discard-zeroes-if-aligned&#x60; - boolean - &#x60;DrbdOptions/PeerDevice/c-fill-target&#x60; - range[&#x60;0-1048576&#x60;] - &#x60;DrbdOptions/PeerDevice/c-max-rate&#x60; - range[&#x60;250-4194304&#x60;] - &#x60;DrbdOptions/PeerDevice/resync-rate&#x60; - range[&#x60;1-8388608&#x60;] - &#x60;DrbdOptions/PeerDevice/c-delay-target&#x60; - range[&#x60;1-100&#x60;] - &#x60;DrbdOptions/PeerDevice/c-min-rate&#x60; - range[&#x60;0-4194304&#x60;] - &#x60;DrbdOptions/PeerDevice/bitmap&#x60; - boolean - &#x60;DrbdOptions/PeerDevice/c-plan-ahead&#x60; - range[&#x60;0-300&#x60;] - &#x60;DrbdOptions/Resource/peer-ack-delay&#x60; - range[&#x60;1-10000&#x60;] - &#x60;DrbdOptions/Resource/quorum-minimum-redundancy&#x60; - enum [&#x60;1-32&#x60;]     * off     * majority     * all  - &#x60;DrbdOptions/Resource/max-io-depth&#x60; - range[&#x60;4-4294967295&#x60;] - &#x60;DrbdOptions/Resource/auto-promote-timeout&#x60; - range[&#x60;0-600&#x60;] - &#x60;DrbdOptions/Resource/quorum&#x60; - enum [&#x60;1-32&#x60;]     * off     * majority     * all  - &#x60;DrbdOptions/Resource/on-no-data-accessible&#x60; - enum     * io-error     * suspend-io  - &#x60;DrbdOptions/Resource/auto-promote&#x60; - boolean - &#x60;DrbdOptions/Resource/cpu-mask&#x60; - string - &#x60;DrbdOptions/Resource/twopc-timeout&#x60; - range[&#x60;50-600&#x60;] - &#x60;DrbdOptions/Resource/twopc-retry-timeout&#x60; - range[&#x60;1-50&#x60;] - &#x60;DrbdOptions/Resource/peer-ack-window&#x60; - range[&#x60;2048-204800&#x60;] - &#x60;DrbdOptions/Resource/on-no-quorum&#x60; - enum     * io-error     * suspend-io  - &#x60;DrbdOptions/Net/max-epoch-size&#x60; - range[&#x60;1-20000&#x60;] - &#x60;DrbdOptions/Net/protocol&#x60; - enum     * A     * B     * C  - &#x60;DrbdOptions/Net/allow-two-primaries&#x60; - boolean - &#x60;DrbdOptions/Net/after-sb-0pri&#x60; - enum     * disconnect     * discard-younger-primary     * discard-older-primary     * discard-zero-changes     * discard-least-changes     * discard-local     * discard-remote  - &#x60;DrbdOptions/Net/ko-count&#x60; - range[&#x60;0-200&#x60;] - &#x60;DrbdOptions/Net/data-integrity-alg&#x60; - string - &#x60;DrbdOptions/Net/ping-timeout&#x60; - range[&#x60;1-300&#x60;] - &#x60;DrbdOptions/Net/sndbuf-size&#x60; - range[&#x60;0-10485760&#x60;] - &#x60;DrbdOptions/Net/transport&#x60; - string - &#x60;DrbdOptions/Net/rcvbuf-size&#x60; - range[&#x60;0-10485760&#x60;] - &#x60;DrbdOptions/Net/max-buffers&#x60; - range[&#x60;32-131072&#x60;] - &#x60;DrbdOptions/Net/fencing&#x60; - enum     * dont-care     * resource-only     * resource-and-stonith  - &#x60;DrbdOptions/Net/csums-alg&#x60; - string - &#x60;DrbdOptions/Net/always-asbp&#x60; - boolean - &#x60;DrbdOptions/Net/congestion-extents&#x60; - range[&#x60;67-65534&#x60;] - &#x60;DrbdOptions/Net/on-congestion&#x60; - enum     * block     * pull-ahead     * disconnect  - &#x60;DrbdOptions/Net/ping-int&#x60; - range[&#x60;1-120&#x60;] - &#x60;DrbdOptions/Net/rr-conflict&#x60; - enum     * disconnect     * call-pri-lost     * violently  - &#x60;DrbdOptions/Net/tcp-cork&#x60; - boolean - &#x60;DrbdOptions/Net/use-rle&#x60; - boolean - &#x60;DrbdOptions/Net/csums-after-crash-only&#x60; - boolean - &#x60;DrbdOptions/Net/socket-check-timeout&#x60; - range[&#x60;0-300&#x60;] - &#x60;DrbdOptions/Net/congestion-fill&#x60; - range[&#x60;0-20971520&#x60;] - &#x60;DrbdOptions/Net/cram-hmac-alg&#x60; - string - &#x60;DrbdOptions/Net/verify-alg&#x60; - string - &#x60;DrbdOptions/Net/shared-secret&#x60; - string - &#x60;DrbdOptions/Net/connect-int&#x60; - range[&#x60;1-120&#x60;] - &#x60;DrbdOptions/Net/timeout&#x60; - range[&#x60;1-600&#x60;] - &#x60;DrbdOptions/Net/after-sb-2pri&#x60; - enum     * disconnect     * call-pri-lost-after-sb     * violently-as0p  - &#x60;DrbdOptions/Net/after-sb-1pri&#x60; - enum     * disconnect     * consensus     * discard-secondary     * call-pri-lost-after-sb     * violently-as0p  - &#x60;DrbdOptions/Handlers/after-resync-target&#x60; - string - &#x60;DrbdOptions/Handlers/before-resync-target&#x60; - string - &#x60;DrbdOptions/Handlers/before-resync-source&#x60; - string - &#x60;DrbdOptions/Handlers/out-of-sync&#x60; - string - &#x60;DrbdOptions/Handlers/quorum-lost&#x60; - string - &#x60;DrbdOptions/Handlers/fence-peer&#x60; - string - &#x60;DrbdOptions/Handlers/unfence-peer&#x60; - string - &#x60;DrbdOptions/Handlers/initial-split-brain&#x60; - string - &#x60;DrbdOptions/Handlers/local-io-error&#x60; - string - &#x60;DrbdOptions/Handlers/pri-lost&#x60; - string - &#x60;DrbdOptions/Handlers/pri-lost-after-sb&#x60; - string - &#x60;DrbdOptions/Handlers/pri-on-incon-degr&#x60; - string - &#x60;DrbdOptions/Handlers/split-brain&#x60; - string 
+    # Sets or modifies properties  Possible properties are: - &#x60;StorPoolName&#x60; - regex[&#x60;^[a-zA-Z0-9_][a-zA-Z0-9_-]{2,47}$&#x60;]      Linstor storage pool name to use.  - &#x60;StorPoolNameDrbdMeta&#x60; - regex[&#x60;^|.internal|[a-zA-Z0-9_][a-zA-Z0-9_-]{2,47}$&#x60;]      Linstor storage pool name to use for external metadata.  - &#x60;PeerSlotsNewResource&#x60; - range[&#x60;1-31&#x60;]      DRBD peer slots to allocate for newly created resources (default 7), the number of peer slots cannot be changed once the resource is created, so allow sufficient slots to increase redundancy in the future  - &#x60;DrbdProxy/CompressionType&#x60; - enum     * zlib     * lzma     * lz4     * zstd  - &#x60;DrbdOptions/AutoEvictMinReplicaCount&#x60; - long      The minimum amount of replicas that should be present for a resource at all times.  - &#x60;FileSystem/Type&#x60; - enum      File system type to use      * ext4     * xfs  - &#x60;FileSystem/MkfsParams&#x60; - string      Additional parameters for the mkfs command  - &#x60;NVMe/TRType&#x60; - enum      NVMe transportion type      * rdma     * tcp  - &#x60;NVMe/Port&#x60; - range[&#x60;1-65535&#x60;]      NVMe port  - &#x60;StorDriver/LvcreateType&#x60; - enum     * linear     * striped     * mirror     * raid0     * raid1     * raid4     * raid5     * raid6     * raid10     * lzma     * lz4  - &#x60;StorDriver/LvcreateOptions&#x60; - regex[&#x60;.*&#x60;]      Additional parameters added to every &#39;lvcreate ... &#39; command  - &#x60;StorDriver/ZfscreateOptions&#x60; - regex[&#x60;.*&#x60;]      Additional parameters added to every &#39;zfs create ... &#39; command  - &#x60;sys/fs/blkio_throttle_read&#x60; - long      Sets the /sys/fs/cgroup/blkio/blkio.throttle.read_bps_device  - &#x60;sys/fs/blkio_throttle_write&#x60; - long      Sets the /sys/fs/cgroup/blkio/blkio.throttle.write_bps_device  - &#x60;sys/fs/blkio_throttle_read_iops&#x60; - long      Sets the /sys/fs/cgroup/blkio/blkio.throttle.read_iops_device  - &#x60;sys/fs/blkio_throttle_write_iops&#x60; - long      Sets the /sys/fs/cgroup/blkio/blkio.throttle.write_iops_device  - &#x60;DrbdOptions/auto-quorum&#x60; - enum      Enables automatic setting of the &#39;quroum&#39; and &#39;on-no-quroum&#39; property      * io-error     * suspend-io     * disabled  - &#x60;DrbdOptions/auto-add-quorum-tiebreaker&#x60; - boolean_true_false      Enables automatic management (creation and deletion) of tie breaking resource  - &#x60;DrbdOptions/auto-diskful&#x60; - long      Makes a resource diskful if it was continously diskless primary for X minutes  - &#x60;DrbdOptions/auto-diskful-allow-cleanup&#x60; - boolean_true_false      Allows this resource to be cleaned up after toggle-disk + resync is finished  - &#x60;Writecache/PoolName&#x60; - regex[&#x60;^[a-zA-Z0-9_][a-zA-Z0-9_-]{2,47}$&#x60;]      Linstor storage pool name for writecache  - &#x60;Writecache/Size&#x60; - regex[&#x60;^100%|[0-9]{1,2}([.][0-9]*)?%|[1-9][0-9]{2,}$&#x60;]      Size of the writecache in % (0-100) or KiB otherwise  - &#x60;Writecache/Options/StartSector&#x60; - long      offset from the start of cache device in 512-byte sectors  - &#x60;Writecache/Options/HighWatermark&#x60; - long      start writeback when the number of used blocks reach this watermark  - &#x60;Writecache/Options/LowWatermark&#x60; - long      stop writeback when the number of used blocks drops below this watermark  - &#x60;Writecache/Options/WritebackJobs&#x60; - long      limit the number of blocks that are in flight during writeback. Setting this value reduces writeback throughput, but it may improve latency of read requests  - &#x60;Writecache/Options/AutocommitBlocks&#x60; - long      when the application writes this amount of blocks without issuing the FLUSH request, the blocks are automatically commited  - &#x60;Writecache/Options/AutocommitTime&#x60; - long      autocommit time in milliseconds. The data is automatically commited if this time passes and no FLUSH request is received  - &#x60;Writecache/Options/Fua&#x60; - enum      \&quot;On\&quot; results in \&quot;fua\&quot; as argument, whereas the value \&quot;Off\&quot; results in \&quot;nofua\&quot; argument      * On     * Off  - &#x60;Writecache/Options/Additional&#x60; - string      Additional arguments passed through  - &#x60;Cache/OpMode&#x60; - enum      Operation mode      * writeback     * writethrough     * passthrough  - &#x60;Cache/MetaPool&#x60; - regex[&#x60;^[a-zA-Z0-9_][a-zA-Z0-9_-]{2,47}$&#x60;]      Name of the storage pool used for the cache metadata. If not specified, this will default to the CachePool property  - &#x60;Cache/Metasize&#x60; - regex[&#x60;^100%|[0-9]{1,2}([.][0-9]*)?%|[1-9][0-9]{2,}$&#x60;]      Size of the cache in % (0-100) or KiB otherwise.  - &#x60;Cache/CachePool&#x60; - regex[&#x60;^[a-zA-Z0-9_][a-zA-Z0-9_-]{2,47}$&#x60;]      Name of the storage pool used for the cache cache device  - &#x60;Cache/Cachesize&#x60; - regex[&#x60;^100%|[0-9]{1,2}([.][0-9]*)?%|[1-9][0-9]{2,}$&#x60;]      Size of the cache in % (0-100) or KiB otherwise.  - &#x60;Cache/Blocksize&#x60; - long      Block size  - &#x60;Cache/Policy&#x60; - enum      Replacemant policy      * mq     * smq     * cleaner  - &#x60;SnapshotShipping/SourceNode&#x60; - string      Node name of the snapshot shipping source  - &#x60;SnapshotShipping/TargetNode&#x60; - string      Node name of the snapshot shipping target  - &#x60;SnapshotShipping/RunEvery&#x60; - long      Runs every X minutes an auto-snapshot-shipping unless the current snapshot-shipping is still running. In this case a new one will be started asap.  - &#x60;SnapshotShipping/Keep&#x60; - long      Keeps the last X sihpped snapshots. Removing this property or having a value &lt;&#x3D; 0 disables auto-cleanup, all auto-snapshots will be kept  - &#x60;AutoSnapshot/RunEvery&#x60; - long      Runs every X minutes an snapshot-creation. Removing this property or having a value &lt;&#x3D; 0 disables auto-snapshotting.  - &#x60;AutoSnapshot/Keep&#x60; - long      Keeps the last X auto-snapshots. Removing this property or having a value &lt;&#x3D; 0 disables auto-cleanup, all auto-snapshots will be kept  - &#x60;AutoSnapshot/NextAutoId&#x60; - long      The next ID to try for auto-snapshots  - &#x60;DrbdOptions/Disk/on-io-error&#x60; - enum     * pass_on     * call-local-io-error     * detach  - &#x60;DrbdOptions/Disk/disk-barrier&#x60; - boolean - &#x60;DrbdOptions/Disk/disk-flushes&#x60; - boolean - &#x60;DrbdOptions/Disk/disk-drain&#x60; - boolean - &#x60;DrbdOptions/Disk/md-flushes&#x60; - boolean - &#x60;DrbdOptions/Disk/resync-after&#x60; - string - &#x60;DrbdOptions/Disk/al-extents&#x60; - range[&#x60;67-65534&#x60;] - &#x60;DrbdOptions/Disk/al-updates&#x60; - boolean - &#x60;DrbdOptions/Disk/discard-zeroes-if-aligned&#x60; - boolean - &#x60;DrbdOptions/Disk/disable-write-same&#x60; - boolean - &#x60;DrbdOptions/Disk/disk-timeout&#x60; - range[&#x60;0-6000&#x60;] - &#x60;DrbdOptions/Disk/read-balancing&#x60; - enum     * prefer-local     * prefer-remote     * round-robin     * least-pending     * when-congested-remote     * 32K-striping     * 64K-striping     * 128K-striping     * 256K-striping     * 512K-striping     * 1M-striping  - &#x60;DrbdOptions/Disk/rs-discard-granularity&#x60; - range[&#x60;0-1048576&#x60;] - &#x60;DrbdOptions/PeerDevice/resync-rate&#x60; - range[&#x60;1-8388608&#x60;] - &#x60;DrbdOptions/PeerDevice/c-plan-ahead&#x60; - range[&#x60;0-300&#x60;] - &#x60;DrbdOptions/PeerDevice/c-delay-target&#x60; - range[&#x60;1-100&#x60;] - &#x60;DrbdOptions/PeerDevice/c-fill-target&#x60; - range[&#x60;0-1048576&#x60;] - &#x60;DrbdOptions/PeerDevice/c-max-rate&#x60; - range[&#x60;250-4194304&#x60;] - &#x60;DrbdOptions/PeerDevice/c-min-rate&#x60; - range[&#x60;0-4194304&#x60;] - &#x60;DrbdOptions/PeerDevice/bitmap&#x60; - boolean - &#x60;DrbdOptions/Resource/cpu-mask&#x60; - string - &#x60;DrbdOptions/Resource/on-no-data-accessible&#x60; - enum     * io-error     * suspend-io  - &#x60;DrbdOptions/Resource/auto-promote&#x60; - boolean - &#x60;DrbdOptions/Resource/peer-ack-window&#x60; - range[&#x60;2048-204800&#x60;] - &#x60;DrbdOptions/Resource/peer-ack-delay&#x60; - range[&#x60;1-10000&#x60;] - &#x60;DrbdOptions/Resource/twopc-timeout&#x60; - range[&#x60;50-600&#x60;] - &#x60;DrbdOptions/Resource/twopc-retry-timeout&#x60; - range[&#x60;1-50&#x60;] - &#x60;DrbdOptions/Resource/auto-promote-timeout&#x60; - range[&#x60;0-600&#x60;] - &#x60;DrbdOptions/Resource/max-io-depth&#x60; - range[&#x60;4-4294967295&#x60;] - &#x60;DrbdOptions/Resource/quorum&#x60; - enum [&#x60;1-32&#x60;]     * off     * majority     * all  - &#x60;DrbdOptions/Resource/on-no-quorum&#x60; - enum     * io-error     * suspend-io  - &#x60;DrbdOptions/Resource/quorum-minimum-redundancy&#x60; - enum [&#x60;1-32&#x60;]     * off     * majority     * all  - &#x60;DrbdOptions/Net/transport&#x60; - string - &#x60;DrbdOptions/Net/protocol&#x60; - enum     * A     * B     * C  - &#x60;DrbdOptions/Net/timeout&#x60; - range[&#x60;1-600&#x60;] - &#x60;DrbdOptions/Net/max-epoch-size&#x60; - range[&#x60;1-20000&#x60;] - &#x60;DrbdOptions/Net/connect-int&#x60; - range[&#x60;1-120&#x60;] - &#x60;DrbdOptions/Net/ping-int&#x60; - range[&#x60;1-120&#x60;] - &#x60;DrbdOptions/Net/sndbuf-size&#x60; - range[&#x60;0-10485760&#x60;] - &#x60;DrbdOptions/Net/rcvbuf-size&#x60; - range[&#x60;0-10485760&#x60;] - &#x60;DrbdOptions/Net/ko-count&#x60; - range[&#x60;0-200&#x60;] - &#x60;DrbdOptions/Net/allow-two-primaries&#x60; - boolean - &#x60;DrbdOptions/Net/cram-hmac-alg&#x60; - string - &#x60;DrbdOptions/Net/shared-secret&#x60; - string - &#x60;DrbdOptions/Net/after-sb-0pri&#x60; - enum     * disconnect     * discard-younger-primary     * discard-older-primary     * discard-zero-changes     * discard-least-changes     * discard-local     * discard-remote  - &#x60;DrbdOptions/Net/after-sb-1pri&#x60; - enum     * disconnect     * consensus     * discard-secondary     * call-pri-lost-after-sb     * violently-as0p  - &#x60;DrbdOptions/Net/after-sb-2pri&#x60; - enum     * disconnect     * call-pri-lost-after-sb     * violently-as0p  - &#x60;DrbdOptions/Net/always-asbp&#x60; - boolean - &#x60;DrbdOptions/Net/rr-conflict&#x60; - enum     * disconnect     * call-pri-lost     * violently     * retry-connect  - &#x60;DrbdOptions/Net/ping-timeout&#x60; - range[&#x60;1-300&#x60;] - &#x60;DrbdOptions/Net/data-integrity-alg&#x60; - string - &#x60;DrbdOptions/Net/tcp-cork&#x60; - boolean - &#x60;DrbdOptions/Net/on-congestion&#x60; - enum     * block     * pull-ahead     * disconnect  - &#x60;DrbdOptions/Net/congestion-fill&#x60; - range[&#x60;0-20971520&#x60;] - &#x60;DrbdOptions/Net/congestion-extents&#x60; - range[&#x60;67-65534&#x60;] - &#x60;DrbdOptions/Net/csums-alg&#x60; - string - &#x60;DrbdOptions/Net/csums-after-crash-only&#x60; - boolean - &#x60;DrbdOptions/Net/verify-alg&#x60; - string - &#x60;DrbdOptions/Net/use-rle&#x60; - boolean - &#x60;DrbdOptions/Net/socket-check-timeout&#x60; - range[&#x60;0-300&#x60;] - &#x60;DrbdOptions/Net/fencing&#x60; - enum     * dont-care     * resource-only     * resource-and-stonith  - &#x60;DrbdOptions/Net/max-buffers&#x60; - range[&#x60;32-131072&#x60;] - &#x60;DrbdOptions/Net/allow-remote-read&#x60; - boolean - &#x60;DrbdOptions/Handlers/after-resync-target&#x60; - string - &#x60;DrbdOptions/Handlers/before-resync-target&#x60; - string - &#x60;DrbdOptions/Handlers/before-resync-source&#x60; - string - &#x60;DrbdOptions/Handlers/out-of-sync&#x60; - string - &#x60;DrbdOptions/Handlers/quorum-lost&#x60; - string - &#x60;DrbdOptions/Handlers/fence-peer&#x60; - string - &#x60;DrbdOptions/Handlers/unfence-peer&#x60; - string - &#x60;DrbdOptions/Handlers/initial-split-brain&#x60; - string - &#x60;DrbdOptions/Handlers/local-io-error&#x60; - string - &#x60;DrbdOptions/Handlers/pri-lost&#x60; - string - &#x60;DrbdOptions/Handlers/pri-lost-after-sb&#x60; - string - &#x60;DrbdOptions/Handlers/pri-on-incon-degr&#x60; - string - &#x60;DrbdOptions/Handlers/split-brain&#x60; - string 
     # @param resource [String] resource to use
     # @param [Hash] opts the optional parameters
     # @option opts [ResourceDefinitionModify] :resource_definition_modify 
@@ -3210,6 +3593,7 @@ module LinstorClient
     # Lists all resource groups.  A single resource group can be queried by adding its name to the resource string like:  /v1/resource-groups/rscgrp1 
     # @param [Hash] opts the optional parameters
     # @option opts [Array<String>] :resource_groups Filter only for the specified resource groups, if not specified no filtering.
+    # @option opts [Array<String>] :props filter by given properties, full property path
     # @option opts [Integer] :offset number of records to skip for pagination
     # @option opts [Integer] :limit maximum number of records to return
     # @return [Array<ResourceGroup>]
@@ -3222,6 +3606,7 @@ module LinstorClient
     # Lists all resource groups.  A single resource group can be queried by adding its name to the resource string like:  /v1/resource-groups/rscgrp1 
     # @param [Hash] opts the optional parameters
     # @option opts [Array<String>] :resource_groups Filter only for the specified resource groups, if not specified no filtering.
+    # @option opts [Array<String>] :props filter by given properties, full property path
     # @option opts [Integer] :offset number of records to skip for pagination
     # @option opts [Integer] :limit maximum number of records to return
     # @return [Array<(Array<ResourceGroup>, Integer, Hash)>] Array<ResourceGroup> data, response status code and response headers
@@ -3247,6 +3632,7 @@ module LinstorClient
       # query parameters
       query_params = opts[:query_params] || {}
       query_params[:'resource_groups'] = @api_client.build_collection_param(opts[:'resource_groups'], :multi) if !opts[:'resource_groups'].nil?
+      query_params[:'props'] = @api_client.build_collection_param(opts[:'props'], :multi) if !opts[:'props'].nil?
       query_params[:'offset'] = opts[:'offset'] if !opts[:'offset'].nil?
       query_params[:'limit'] = opts[:'limit'] if !opts[:'limit'].nil?
 
@@ -3662,7 +4048,7 @@ module LinstorClient
     end
 
     # modify a resource
-    # Sets or modifies properties  Possible properties are: - `StorPoolName` - regex[`^[a-zA-Z0-9_][a-zA-Z0-9_-]{2,47}$`]      Linstor storage pool name to use.  - `StorPoolNameDrbdMeta` - regex[`^|.internal|[a-zA-Z0-9_][a-zA-Z0-9_-]{2,47}$`]      Linstor storage pool name to use.  - `DrbdMetaType` - enum     * external     * internal  - `PrefNic` - regex[`^[a-zA-Z0-9_][a-zA-Z0-9_-]{2,47}$`]      Preferred network interface to use  - `PeerSlots` - range[`1-31`]      DRBD peer slots present on resource  - `FileSystem/Type` - enum      File system type to use      * ext4     * xfs  - `FileSystem/MkfsParams` - string      Additional parameters for the mkfs command  - `NVMe/PrefNic` - regex[`^[a-zA-Z0-9_][a-zA-Z0-9_-]{2,47}$`]      Preferred network interface to use  - `sys/fs/blkio_throttle_read` - long      Sets the /sys/fs/cgroup/blkio/blkio.throttle.read_bps_device  - `sys/fs/blkio_throttle_write` - long      Sets the /sys/fs/cgroup/blkio/blkio.throttle.write_bps_device  
+    # Sets or modifies properties  Possible properties are: - `StorPoolName` - regex[`^[a-zA-Z0-9_][a-zA-Z0-9_-]{2,47}$`]      Linstor storage pool name to use.  - `StorPoolNameDrbdMeta` - regex[`^|.internal|[a-zA-Z0-9_][a-zA-Z0-9_-]{2,47}$`]      Linstor storage pool name to use for external metadata.  - `PrefNic` - regex[`^[a-zA-Z0-9_][a-zA-Z0-9_-]{2,47}$`]      Preferred network interface to use  - `PeerSlots` - range[`1-31`]      DRBD peer slots present on resource  - `FileSystem/Type` - enum      File system type to use      * ext4     * xfs  - `FileSystem/MkfsParams` - string      Additional parameters for the mkfs command  - `NVMe/PrefNic` - regex[`^[a-zA-Z0-9_][a-zA-Z0-9_-]{2,47}$`]      Preferred network interface to use  - `sys/fs/blkio_throttle_read` - long      Sets the /sys/fs/cgroup/blkio/blkio.throttle.read_bps_device  - `sys/fs/blkio_throttle_write` - long      Sets the /sys/fs/cgroup/blkio/blkio.throttle.write_bps_device  - `sys/fs/blkio_throttle_read_iops` - long      Sets the /sys/fs/cgroup/blkio/blkio.throttle.read_iops_device  - `sys/fs/blkio_throttle_write_iops` - long      Sets the /sys/fs/cgroup/blkio/blkio.throttle.write_iops_device  - `DrbdOptions/auto-diskful-allow-cleanup` - boolean_true_false      Allows this resource to be cleaned up after toggle-disk + resync is finished  
     # @param resource [String] resource to use
     # @param node [String] node to use
     # @param [Hash] opts the optional parameters
@@ -3674,7 +4060,7 @@ module LinstorClient
     end
 
     # modify a resource
-    # Sets or modifies properties  Possible properties are: - &#x60;StorPoolName&#x60; - regex[&#x60;^[a-zA-Z0-9_][a-zA-Z0-9_-]{2,47}$&#x60;]      Linstor storage pool name to use.  - &#x60;StorPoolNameDrbdMeta&#x60; - regex[&#x60;^|.internal|[a-zA-Z0-9_][a-zA-Z0-9_-]{2,47}$&#x60;]      Linstor storage pool name to use.  - &#x60;DrbdMetaType&#x60; - enum     * external     * internal  - &#x60;PrefNic&#x60; - regex[&#x60;^[a-zA-Z0-9_][a-zA-Z0-9_-]{2,47}$&#x60;]      Preferred network interface to use  - &#x60;PeerSlots&#x60; - range[&#x60;1-31&#x60;]      DRBD peer slots present on resource  - &#x60;FileSystem/Type&#x60; - enum      File system type to use      * ext4     * xfs  - &#x60;FileSystem/MkfsParams&#x60; - string      Additional parameters for the mkfs command  - &#x60;NVMe/PrefNic&#x60; - regex[&#x60;^[a-zA-Z0-9_][a-zA-Z0-9_-]{2,47}$&#x60;]      Preferred network interface to use  - &#x60;sys/fs/blkio_throttle_read&#x60; - long      Sets the /sys/fs/cgroup/blkio/blkio.throttle.read_bps_device  - &#x60;sys/fs/blkio_throttle_write&#x60; - long      Sets the /sys/fs/cgroup/blkio/blkio.throttle.write_bps_device  
+    # Sets or modifies properties  Possible properties are: - &#x60;StorPoolName&#x60; - regex[&#x60;^[a-zA-Z0-9_][a-zA-Z0-9_-]{2,47}$&#x60;]      Linstor storage pool name to use.  - &#x60;StorPoolNameDrbdMeta&#x60; - regex[&#x60;^|.internal|[a-zA-Z0-9_][a-zA-Z0-9_-]{2,47}$&#x60;]      Linstor storage pool name to use for external metadata.  - &#x60;PrefNic&#x60; - regex[&#x60;^[a-zA-Z0-9_][a-zA-Z0-9_-]{2,47}$&#x60;]      Preferred network interface to use  - &#x60;PeerSlots&#x60; - range[&#x60;1-31&#x60;]      DRBD peer slots present on resource  - &#x60;FileSystem/Type&#x60; - enum      File system type to use      * ext4     * xfs  - &#x60;FileSystem/MkfsParams&#x60; - string      Additional parameters for the mkfs command  - &#x60;NVMe/PrefNic&#x60; - regex[&#x60;^[a-zA-Z0-9_][a-zA-Z0-9_-]{2,47}$&#x60;]      Preferred network interface to use  - &#x60;sys/fs/blkio_throttle_read&#x60; - long      Sets the /sys/fs/cgroup/blkio/blkio.throttle.read_bps_device  - &#x60;sys/fs/blkio_throttle_write&#x60; - long      Sets the /sys/fs/cgroup/blkio/blkio.throttle.write_bps_device  - &#x60;sys/fs/blkio_throttle_read_iops&#x60; - long      Sets the /sys/fs/cgroup/blkio/blkio.throttle.read_iops_device  - &#x60;sys/fs/blkio_throttle_write_iops&#x60; - long      Sets the /sys/fs/cgroup/blkio/blkio.throttle.write_iops_device  - &#x60;DrbdOptions/auto-diskful-allow-cleanup&#x60; - boolean_true_false      Allows this resource to be cleaned up after toggle-disk + resync is finished  
     # @param resource [String] resource to use
     # @param node [String] node to use
     # @param [Hash] opts the optional parameters
@@ -4604,6 +4990,207 @@ module LinstorClient
       return data, status_code, headers
     end
 
+    # show satellite config
+    # Show Satellite config 
+    # @param node [String] node to use
+    # @param [Hash] opts the optional parameters
+    # @return [SatelliteConfig]
+    def satellite_config(node, opts = {})
+      data, _status_code, _headers = satellite_config_with_http_info(node, opts)
+      data
+    end
+
+    # show satellite config
+    # Show Satellite config 
+    # @param node [String] node to use
+    # @param [Hash] opts the optional parameters
+    # @return [Array<(SatelliteConfig, Integer, Hash)>] SatelliteConfig data, response status code and response headers
+    def satellite_config_with_http_info(node, opts = {})
+      if @api_client.config.debugging
+        @api_client.config.logger.debug 'Calling API: DevelopersApi.satellite_config ...'
+      end
+      # verify the required parameter 'node' is set
+      if @api_client.config.client_side_validation && node.nil?
+        fail ArgumentError, "Missing the required parameter 'node' when calling DevelopersApi.satellite_config"
+      end
+      # resource path
+      local_var_path = '/v1/nodes/{node}/config'.sub('{' + 'node' + '}', CGI.escape(node.to_s))
+
+      # query parameters
+      query_params = opts[:query_params] || {}
+
+      # header parameters
+      header_params = opts[:header_params] || {}
+      # HTTP header 'Accept' (if needed)
+      header_params['Accept'] = @api_client.select_header_accept(['application/json'])
+
+      # form parameters
+      form_params = opts[:form_params] || {}
+
+      # http body (model)
+      post_body = opts[:debug_body]
+
+      # return_type
+      return_type = opts[:debug_return_type] || 'SatelliteConfig'
+
+      # auth_names
+      auth_names = opts[:debug_auth_names] || []
+
+      new_options = opts.merge(
+        :operation => :"DevelopersApi.satellite_config",
+        :header_params => header_params,
+        :query_params => query_params,
+        :form_params => form_params,
+        :body => post_body,
+        :auth_names => auth_names,
+        :return_type => return_type
+      )
+
+      data, status_code, headers = @api_client.call_api(:GET, local_var_path, new_options)
+      if @api_client.config.debugging
+        @api_client.config.logger.debug "API called: DevelopersApi#satellite_config\nData: #{data.inspect}\nStatus code: #{status_code}\nHeaders: #{headers}"
+      end
+      return data, status_code, headers
+    end
+
+    # ship a snapshot
+    # Transfers the resource from one node to another based on snapshot-shipping
+    # @param resource [String] resource to use
+    # @param [Hash] opts the optional parameters
+    # @option opts [SnapshotShipping] :snapshot_shipping 
+    # @return [ApiCallRc]
+    def snapshot_shipping(resource, opts = {})
+      data, _status_code, _headers = snapshot_shipping_with_http_info(resource, opts)
+      data
+    end
+
+    # ship a snapshot
+    # Transfers the resource from one node to another based on snapshot-shipping
+    # @param resource [String] resource to use
+    # @param [Hash] opts the optional parameters
+    # @option opts [SnapshotShipping] :snapshot_shipping 
+    # @return [Array<(ApiCallRc, Integer, Hash)>] ApiCallRc data, response status code and response headers
+    def snapshot_shipping_with_http_info(resource, opts = {})
+      if @api_client.config.debugging
+        @api_client.config.logger.debug 'Calling API: DevelopersApi.snapshot_shipping ...'
+      end
+      # verify the required parameter 'resource' is set
+      if @api_client.config.client_side_validation && resource.nil?
+        fail ArgumentError, "Missing the required parameter 'resource' when calling DevelopersApi.snapshot_shipping"
+      end
+      # resource path
+      local_var_path = '/v1/resource-definitions/{resource}/snapshot-shipping'.sub('{' + 'resource' + '}', CGI.escape(resource.to_s))
+
+      # query parameters
+      query_params = opts[:query_params] || {}
+
+      # header parameters
+      header_params = opts[:header_params] || {}
+      # HTTP header 'Accept' (if needed)
+      header_params['Accept'] = @api_client.select_header_accept(['application/json'])
+      # HTTP header 'Content-Type'
+      content_type = @api_client.select_header_content_type(['application/json'])
+      if !content_type.nil?
+          header_params['Content-Type'] = content_type
+      end
+
+      # form parameters
+      form_params = opts[:form_params] || {}
+
+      # http body (model)
+      post_body = opts[:debug_body] || @api_client.object_to_http_body(opts[:'snapshot_shipping'])
+
+      # return_type
+      return_type = opts[:debug_return_type] || 'ApiCallRc'
+
+      # auth_names
+      auth_names = opts[:debug_auth_names] || []
+
+      new_options = opts.merge(
+        :operation => :"DevelopersApi.snapshot_shipping",
+        :header_params => header_params,
+        :query_params => query_params,
+        :form_params => form_params,
+        :body => post_body,
+        :auth_names => auth_names,
+        :return_type => return_type
+      )
+
+      data, status_code, headers = @api_client.call_api(:POST, local_var_path, new_options)
+      if @api_client.config.debugging
+        @api_client.config.logger.debug "API called: DevelopersApi#snapshot_shipping\nData: #{data.inspect}\nStatus code: #{status_code}\nHeaders: #{headers}"
+      end
+      return data, status_code, headers
+    end
+
+    # modify satellite config
+    # @param node [String] node to use
+    # @param [Hash] opts the optional parameters
+    # @option opts [SatelliteConfig] :satellite_config 
+    # @return [ApiCallRc]
+    def stlt_set_config(node, opts = {})
+      data, _status_code, _headers = stlt_set_config_with_http_info(node, opts)
+      data
+    end
+
+    # modify satellite config
+    # @param node [String] node to use
+    # @param [Hash] opts the optional parameters
+    # @option opts [SatelliteConfig] :satellite_config 
+    # @return [Array<(ApiCallRc, Integer, Hash)>] ApiCallRc data, response status code and response headers
+    def stlt_set_config_with_http_info(node, opts = {})
+      if @api_client.config.debugging
+        @api_client.config.logger.debug 'Calling API: DevelopersApi.stlt_set_config ...'
+      end
+      # verify the required parameter 'node' is set
+      if @api_client.config.client_side_validation && node.nil?
+        fail ArgumentError, "Missing the required parameter 'node' when calling DevelopersApi.stlt_set_config"
+      end
+      # resource path
+      local_var_path = '/v1/nodes/{node}/config'.sub('{' + 'node' + '}', CGI.escape(node.to_s))
+
+      # query parameters
+      query_params = opts[:query_params] || {}
+
+      # header parameters
+      header_params = opts[:header_params] || {}
+      # HTTP header 'Accept' (if needed)
+      header_params['Accept'] = @api_client.select_header_accept(['application/json'])
+      # HTTP header 'Content-Type'
+      content_type = @api_client.select_header_content_type(['application/json'])
+      if !content_type.nil?
+          header_params['Content-Type'] = content_type
+      end
+
+      # form parameters
+      form_params = opts[:form_params] || {}
+
+      # http body (model)
+      post_body = opts[:debug_body] || @api_client.object_to_http_body(opts[:'satellite_config'])
+
+      # return_type
+      return_type = opts[:debug_return_type] || 'ApiCallRc'
+
+      # auth_names
+      auth_names = opts[:debug_auth_names] || []
+
+      new_options = opts.merge(
+        :operation => :"DevelopersApi.stlt_set_config",
+        :header_params => header_params,
+        :query_params => query_params,
+        :form_params => form_params,
+        :body => post_body,
+        :auth_names => auth_names,
+        :return_type => return_type
+      )
+
+      data, status_code, headers = @api_client.call_api(:PUT, local_var_path, new_options)
+      if @api_client.config.debugging
+        @api_client.config.logger.debug "API called: DevelopersApi#stlt_set_config\nData: #{data.inspect}\nStatus code: #{status_code}\nHeaders: #{headers}"
+      end
+      return data, status_code, headers
+    end
+
     # modify a storage pool definition
     # Sets or modifies properties  Possible properties are: - `MaxOversubscriptionRatio` - range[`1-1000`] 
     # @param storagepool [String] 
@@ -4939,6 +5526,63 @@ module LinstorClient
       return data, status_code, headers
     end
 
+    # drbd promotion event changes
+    # Notifies clients about changes in may_promote of resources
+    # @param [Hash] opts the optional parameters
+    # @return [OneOfEventMayPromoteChange]
+    def v1_events_drbd_promotion_get(opts = {})
+      data, _status_code, _headers = v1_events_drbd_promotion_get_with_http_info(opts)
+      data
+    end
+
+    # drbd promotion event changes
+    # Notifies clients about changes in may_promote of resources
+    # @param [Hash] opts the optional parameters
+    # @return [Array<(OneOfEventMayPromoteChange, Integer, Hash)>] OneOfEventMayPromoteChange data, response status code and response headers
+    def v1_events_drbd_promotion_get_with_http_info(opts = {})
+      if @api_client.config.debugging
+        @api_client.config.logger.debug 'Calling API: DevelopersApi.v1_events_drbd_promotion_get ...'
+      end
+      # resource path
+      local_var_path = '/v1/events/drbd/promotion'
+
+      # query parameters
+      query_params = opts[:query_params] || {}
+
+      # header parameters
+      header_params = opts[:header_params] || {}
+      # HTTP header 'Accept' (if needed)
+      header_params['Accept'] = @api_client.select_header_accept(['text/event-stream'])
+
+      # form parameters
+      form_params = opts[:form_params] || {}
+
+      # http body (model)
+      post_body = opts[:debug_body]
+
+      # return_type
+      return_type = opts[:debug_return_type] || 'OneOfEventMayPromoteChange'
+
+      # auth_names
+      auth_names = opts[:debug_auth_names] || []
+
+      new_options = opts.merge(
+        :operation => :"DevelopersApi.v1_events_drbd_promotion_get",
+        :header_params => header_params,
+        :query_params => query_params,
+        :form_params => form_params,
+        :body => post_body,
+        :auth_names => auth_names,
+        :return_type => return_type
+      )
+
+      data, status_code, headers = @api_client.call_api(:GET, local_var_path, new_options)
+      if @api_client.config.debugging
+        @api_client.config.logger.debug "API called: DevelopersApi#v1_events_drbd_promotion_get\nData: #{data.inspect}\nStatus code: #{status_code}\nHeaders: #{headers}"
+      end
+      return data, status_code, headers
+    end
+
     # show physical storage on nodes, to be used with LINSTOR
     # Gives a grouped list of physical storage that can be turned into a LINSTOR storage-pool
     # @param [Hash] opts the optional parameters
@@ -5017,9 +5661,10 @@ module LinstorClient
     # query all resources with their volumes
     # This REST-resource should be used if you want to get an overview of all resources with their volumes.
     # @param [Hash] opts the optional parameters
-    # @option opts [Array<String>] :nodes Filter only for the specified nodes, if not specified no filtering.
+    # @option opts [Array<String>] :nodes Filter only for the specified nodes, if not specified, no filtering.
+    # @option opts [Array<String>] :resources Filter only for the specified resources, if not specified, no filtering.
     # @option opts [Array<String>] :storage_pools Filter only for the specified storage pools, if not specified no filtering.
-    # @option opts [Array<String>] :resources Filter only for the specified resources, if not specified no filtering.
+    # @option opts [Array<String>] :props filter by given properties, full property path
     # @option opts [Integer] :offset number of records to skip for pagination
     # @option opts [Integer] :limit maximum number of records to return
     # @return [Array<ResourceWithVolumes>]
@@ -5031,9 +5676,10 @@ module LinstorClient
     # query all resources with their volumes
     # This REST-resource should be used if you want to get an overview of all resources with their volumes.
     # @param [Hash] opts the optional parameters
-    # @option opts [Array<String>] :nodes Filter only for the specified nodes, if not specified no filtering.
+    # @option opts [Array<String>] :nodes Filter only for the specified nodes, if not specified, no filtering.
+    # @option opts [Array<String>] :resources Filter only for the specified resources, if not specified, no filtering.
     # @option opts [Array<String>] :storage_pools Filter only for the specified storage pools, if not specified no filtering.
-    # @option opts [Array<String>] :resources Filter only for the specified resources, if not specified no filtering.
+    # @option opts [Array<String>] :props filter by given properties, full property path
     # @option opts [Integer] :offset number of records to skip for pagination
     # @option opts [Integer] :limit maximum number of records to return
     # @return [Array<(Array<ResourceWithVolumes>, Integer, Hash)>] Array<ResourceWithVolumes> data, response status code and response headers
@@ -5059,8 +5705,9 @@ module LinstorClient
       # query parameters
       query_params = opts[:query_params] || {}
       query_params[:'nodes'] = @api_client.build_collection_param(opts[:'nodes'], :multi) if !opts[:'nodes'].nil?
-      query_params[:'storage_pools'] = @api_client.build_collection_param(opts[:'storage_pools'], :multi) if !opts[:'storage_pools'].nil?
       query_params[:'resources'] = @api_client.build_collection_param(opts[:'resources'], :multi) if !opts[:'resources'].nil?
+      query_params[:'storage_pools'] = @api_client.build_collection_param(opts[:'storage_pools'], :multi) if !opts[:'storage_pools'].nil?
+      query_params[:'props'] = @api_client.build_collection_param(opts[:'props'], :multi) if !opts[:'props'].nil?
       query_params[:'offset'] = opts[:'offset'] if !opts[:'offset'].nil?
       query_params[:'limit'] = opts[:'limit'] if !opts[:'limit'].nil?
 
@@ -5098,11 +5745,182 @@ module LinstorClient
       return data, status_code, headers
     end
 
+    # view current snapshot shippings
+    # @param [Hash] opts the optional parameters
+    # @option opts [Array<String>] :nodes Filter only for the specified nodes, if not specified, no filtering.
+    # @option opts [Array<String>] :resources Filter only for the specified resources, if not specified, no filtering.
+    # @option opts [Array<String>] :snapshots Filter only for the specified snapshots, if not specified, no filtering.
+    # @option opts [Array<String>] :status Filter only for the specified status, if not specified, no filtering.
+    # @option opts [Integer] :offset number of records to skip for pagination
+    # @option opts [Integer] :limit maximum number of records to return
+    # @return [Array<SnapshotShippingStatus>]
+    def view_snapshot_shippings(opts = {})
+      data, _status_code, _headers = view_snapshot_shippings_with_http_info(opts)
+      data
+    end
+
+    # view current snapshot shippings
+    # @param [Hash] opts the optional parameters
+    # @option opts [Array<String>] :nodes Filter only for the specified nodes, if not specified, no filtering.
+    # @option opts [Array<String>] :resources Filter only for the specified resources, if not specified, no filtering.
+    # @option opts [Array<String>] :snapshots Filter only for the specified snapshots, if not specified, no filtering.
+    # @option opts [Array<String>] :status Filter only for the specified status, if not specified, no filtering.
+    # @option opts [Integer] :offset number of records to skip for pagination
+    # @option opts [Integer] :limit maximum number of records to return
+    # @return [Array<(Array<SnapshotShippingStatus>, Integer, Hash)>] Array<SnapshotShippingStatus> data, response status code and response headers
+    def view_snapshot_shippings_with_http_info(opts = {})
+      if @api_client.config.debugging
+        @api_client.config.logger.debug 'Calling API: DevelopersApi.view_snapshot_shippings ...'
+      end
+      allowable_values = ["running", "complete"]
+      if @api_client.config.client_side_validation && opts[:'status'] && !opts[:'status'].all? { |item| allowable_values.include?(item) }
+        fail ArgumentError, "invalid value for \"status\", must include one of #{allowable_values}"
+      end
+      if @api_client.config.client_side_validation && !opts[:'offset'].nil? && opts[:'offset'] < 0
+        fail ArgumentError, 'invalid value for "opts[:"offset"]" when calling DevelopersApi.view_snapshot_shippings, must be greater than or equal to 0.'
+      end
+
+      if @api_client.config.client_side_validation && !opts[:'limit'].nil? && opts[:'limit'] > 50
+        fail ArgumentError, 'invalid value for "opts[:"limit"]" when calling DevelopersApi.view_snapshot_shippings, must be smaller than or equal to 50.'
+      end
+
+      if @api_client.config.client_side_validation && !opts[:'limit'].nil? && opts[:'limit'] < 0
+        fail ArgumentError, 'invalid value for "opts[:"limit"]" when calling DevelopersApi.view_snapshot_shippings, must be greater than or equal to 0.'
+      end
+
+      # resource path
+      local_var_path = '/v1/view/snapshot-shippings'
+
+      # query parameters
+      query_params = opts[:query_params] || {}
+      query_params[:'nodes'] = @api_client.build_collection_param(opts[:'nodes'], :multi) if !opts[:'nodes'].nil?
+      query_params[:'resources'] = @api_client.build_collection_param(opts[:'resources'], :multi) if !opts[:'resources'].nil?
+      query_params[:'snapshots'] = @api_client.build_collection_param(opts[:'snapshots'], :multi) if !opts[:'snapshots'].nil?
+      query_params[:'status'] = @api_client.build_collection_param(opts[:'status'], :multi) if !opts[:'status'].nil?
+      query_params[:'offset'] = opts[:'offset'] if !opts[:'offset'].nil?
+      query_params[:'limit'] = opts[:'limit'] if !opts[:'limit'].nil?
+
+      # header parameters
+      header_params = opts[:header_params] || {}
+      # HTTP header 'Accept' (if needed)
+      header_params['Accept'] = @api_client.select_header_accept(['application/json'])
+
+      # form parameters
+      form_params = opts[:form_params] || {}
+
+      # http body (model)
+      post_body = opts[:debug_body]
+
+      # return_type
+      return_type = opts[:debug_return_type] || 'Array<SnapshotShippingStatus>'
+
+      # auth_names
+      auth_names = opts[:debug_auth_names] || []
+
+      new_options = opts.merge(
+        :operation => :"DevelopersApi.view_snapshot_shippings",
+        :header_params => header_params,
+        :query_params => query_params,
+        :form_params => form_params,
+        :body => post_body,
+        :auth_names => auth_names,
+        :return_type => return_type
+      )
+
+      data, status_code, headers = @api_client.call_api(:GET, local_var_path, new_options)
+      if @api_client.config.debugging
+        @api_client.config.logger.debug "API called: DevelopersApi#view_snapshot_shippings\nData: #{data.inspect}\nStatus code: #{status_code}\nHeaders: #{headers}"
+      end
+      return data, status_code, headers
+    end
+
+    # query all snapshots known to linstor
+    # This REST-resource should be used if you want to get an overview of all snapshots.
+    # @param [Hash] opts the optional parameters
+    # @option opts [Array<String>] :nodes Filter only for the specified nodes, if not specified, no filtering.
+    # @option opts [Array<String>] :resources Filter only for the specified resources, if not specified, no filtering.
+    # @option opts [Integer] :offset number of records to skip for pagination
+    # @option opts [Integer] :limit maximum number of records to return
+    # @return [Array<Snapshot>]
+    def view_snapshots(opts = {})
+      data, _status_code, _headers = view_snapshots_with_http_info(opts)
+      data
+    end
+
+    # query all snapshots known to linstor
+    # This REST-resource should be used if you want to get an overview of all snapshots.
+    # @param [Hash] opts the optional parameters
+    # @option opts [Array<String>] :nodes Filter only for the specified nodes, if not specified, no filtering.
+    # @option opts [Array<String>] :resources Filter only for the specified resources, if not specified, no filtering.
+    # @option opts [Integer] :offset number of records to skip for pagination
+    # @option opts [Integer] :limit maximum number of records to return
+    # @return [Array<(Array<Snapshot>, Integer, Hash)>] Array<Snapshot> data, response status code and response headers
+    def view_snapshots_with_http_info(opts = {})
+      if @api_client.config.debugging
+        @api_client.config.logger.debug 'Calling API: DevelopersApi.view_snapshots ...'
+      end
+      if @api_client.config.client_side_validation && !opts[:'offset'].nil? && opts[:'offset'] < 0
+        fail ArgumentError, 'invalid value for "opts[:"offset"]" when calling DevelopersApi.view_snapshots, must be greater than or equal to 0.'
+      end
+
+      if @api_client.config.client_side_validation && !opts[:'limit'].nil? && opts[:'limit'] > 50
+        fail ArgumentError, 'invalid value for "opts[:"limit"]" when calling DevelopersApi.view_snapshots, must be smaller than or equal to 50.'
+      end
+
+      if @api_client.config.client_side_validation && !opts[:'limit'].nil? && opts[:'limit'] < 0
+        fail ArgumentError, 'invalid value for "opts[:"limit"]" when calling DevelopersApi.view_snapshots, must be greater than or equal to 0.'
+      end
+
+      # resource path
+      local_var_path = '/v1/view/snapshots'
+
+      # query parameters
+      query_params = opts[:query_params] || {}
+      query_params[:'nodes'] = @api_client.build_collection_param(opts[:'nodes'], :multi) if !opts[:'nodes'].nil?
+      query_params[:'resources'] = @api_client.build_collection_param(opts[:'resources'], :multi) if !opts[:'resources'].nil?
+      query_params[:'offset'] = opts[:'offset'] if !opts[:'offset'].nil?
+      query_params[:'limit'] = opts[:'limit'] if !opts[:'limit'].nil?
+
+      # header parameters
+      header_params = opts[:header_params] || {}
+      # HTTP header 'Accept' (if needed)
+      header_params['Accept'] = @api_client.select_header_accept(['application/json'])
+
+      # form parameters
+      form_params = opts[:form_params] || {}
+
+      # http body (model)
+      post_body = opts[:debug_body]
+
+      # return_type
+      return_type = opts[:debug_return_type] || 'Array<Snapshot>'
+
+      # auth_names
+      auth_names = opts[:debug_auth_names] || []
+
+      new_options = opts.merge(
+        :operation => :"DevelopersApi.view_snapshots",
+        :header_params => header_params,
+        :query_params => query_params,
+        :form_params => form_params,
+        :body => post_body,
+        :auth_names => auth_names,
+        :return_type => return_type
+      )
+
+      data, status_code, headers = @api_client.call_api(:GET, local_var_path, new_options)
+      if @api_client.config.debugging
+        @api_client.config.logger.debug "API called: DevelopersApi#view_snapshots\nData: #{data.inspect}\nStatus code: #{status_code}\nHeaders: #{headers}"
+      end
+      return data, status_code, headers
+    end
+
     # query all storage pools
     # This REST-resource should be used if you want to get an overview of all storage pools.
     # @param [Hash] opts the optional parameters
-    # @option opts [Array<String>] :nodes Filter only for the specified nodes, if not specified no filtering.
+    # @option opts [Array<String>] :nodes Filter only for the specified nodes, if not specified, no filtering.
     # @option opts [Array<String>] :storage_pools Filter only for the specified storage pools, if not specified no filtering.
+    # @option opts [Array<String>] :props filter by given properties, full property path
     # @option opts [Integer] :offset number of records to skip for pagination
     # @option opts [Integer] :limit maximum number of records to return
     # @return [Array<StoragePool>]
@@ -5114,8 +5932,9 @@ module LinstorClient
     # query all storage pools
     # This REST-resource should be used if you want to get an overview of all storage pools.
     # @param [Hash] opts the optional parameters
-    # @option opts [Array<String>] :nodes Filter only for the specified nodes, if not specified no filtering.
+    # @option opts [Array<String>] :nodes Filter only for the specified nodes, if not specified, no filtering.
     # @option opts [Array<String>] :storage_pools Filter only for the specified storage pools, if not specified no filtering.
+    # @option opts [Array<String>] :props filter by given properties, full property path
     # @option opts [Integer] :offset number of records to skip for pagination
     # @option opts [Integer] :limit maximum number of records to return
     # @return [Array<(Array<StoragePool>, Integer, Hash)>] Array<StoragePool> data, response status code and response headers
@@ -5142,6 +5961,7 @@ module LinstorClient
       query_params = opts[:query_params] || {}
       query_params[:'nodes'] = @api_client.build_collection_param(opts[:'nodes'], :multi) if !opts[:'nodes'].nil?
       query_params[:'storage_pools'] = @api_client.build_collection_param(opts[:'storage_pools'], :multi) if !opts[:'storage_pools'].nil?
+      query_params[:'props'] = @api_client.build_collection_param(opts[:'props'], :multi) if !opts[:'props'].nil?
       query_params[:'offset'] = opts[:'offset'] if !opts[:'offset'].nil?
       query_params[:'limit'] = opts[:'limit'] if !opts[:'limit'].nil?
 
@@ -5400,7 +6220,7 @@ module LinstorClient
     end
 
     # modify a volume-definition
-    # Sets or modifies properties  Possible properties are: - `StorPoolName` - regex[`^[a-zA-Z0-9_][a-zA-Z0-9_-]{2,47}$`]      Linstor storage pool name to use.  - `StorPoolNameDrbdMeta` - regex[`^|.internal|[a-zA-Z0-9_][a-zA-Z0-9_-]{2,47}$`]      Linstor storage pool name to use.  - `DrbdMetaType` - enum     * external     * internal  - `OverrideVlmId` - regex[`.*`]      Overwrites the generated '<resource-name>_<5 digit volume number>' volume name for migration purposes  - `AllowLargerVolumeSize` - boolean_true_false      Do not fail when the underlying volume is larger than expected  - `FileSystem/Type` - enum      File system type to use      * ext4     * xfs  - `FileSystem/MkfsParams` - string      Additional parameters for the mkfs command  - `StorDriver/LvcreateType` - enum     * linear     * striped     * mirror     * raid0     * raid1     * raid4     * raid5     * raid6     * raid10     * lzma     * lz4  - `DrbdCurrentGi` - regex[`[a-fA-F0-9]{16}`] - `sys/fs/blkio_throttle_read` - long      Sets the /sys/fs/cgroup/blkio/blkio.throttle.read_bps_device  - `sys/fs/blkio_throttle_write` - long      Sets the /sys/fs/cgroup/blkio/blkio.throttle.write_bps_device  - `Writecache/PoolName` - regex[`^[a-zA-Z0-9_][a-zA-Z0-9_-]{2,47}$`]      Linstor storage pool name for writecache  - `Writecache/Size` - regex[`^100%|[0-9]{1,2}([.][0-9]*)?%|[1-9][0-9]{2,}$`]      Size of the writecache in % (0-100) or KiB otherwise  - `Writecache/Blocksize` - long      4096 is recommended; the maximum block size is the page size  - `Writecache/Options/StartSector` - long      offset from the start of cache device in 512-byte sectors  - `Writecache/Options/HighWatermark` - long      start writeback when the number of used blocks reach this watermark  - `Writecache/Options/LowWatermark` - long      stop writeback when the number of used blocks drops below this watermark  - `Writecache/Options/WritebackJobs` - long      limit the number of blocks that are in flight during writeback. Setting this value reduces writeback throughput, but it may improve latency of read requests  - `Writecache/Options/AutocommitBlocks` - long      when the application writes this amount of blocks without issuing the FLUSH request, the blocks are automatically commited  - `Writecache/Options/AutocommitTime` - long      autocommit time in milliseconds. The data is automatically commited if this time passes and no FLUSH request is received  - `Writecache/Options/Fua` - enum      \"On\" results in \"fua\" as argument, whereas the value \"Off\" results in \"nofua\" argument      * On     * Off  - `Writecache/Options/Additional` - string      Additional arguments passed through  - `DrbdOptions/Disk/read-balancing` - enum     * prefer-local     * prefer-remote     * round-robin     * least-pending     * when-congested-remote     * 32K-striping     * 64K-striping     * 128K-striping     * 256K-striping     * 512K-striping     * 1M-striping  - `DrbdOptions/Disk/on-io-error` - enum     * pass_on     * call-local-io-error     * detach  - `DrbdOptions/Disk/disk-drain` - boolean - `DrbdOptions/Disk/resync-after` - string - `DrbdOptions/Disk/disk-timeout` - range[`0-6000`] - `DrbdOptions/Disk/disable-write-same` - boolean - `DrbdOptions/Disk/rs-discard-granularity` - range[`0-1048576`] - `DrbdOptions/Disk/disk-flushes` - boolean - `DrbdOptions/Disk/al-extents` - range[`67-65534`] - `DrbdOptions/Disk/al-updates` - boolean - `DrbdOptions/Disk/md-flushes` - boolean - `DrbdOptions/Disk/disk-barrier` - boolean - `DrbdOptions/Disk/discard-zeroes-if-aligned` - boolean 
+    # Sets or modifies properties  Possible properties are: - `StorPoolName` - regex[`^[a-zA-Z0-9_][a-zA-Z0-9_-]{2,47}$`]      Linstor storage pool name to use.  - `StorPoolNameDrbdMeta` - regex[`^|.internal|[a-zA-Z0-9_][a-zA-Z0-9_-]{2,47}$`]      Linstor storage pool name to use for external metadata.  - `OverrideVlmId` - regex[`.*`]      Overwrites the generated '<resource-name>_<5 digit volume number>' volume name for migration purposes  - `FileSystem/Type` - enum      File system type to use      * ext4     * xfs  - `FileSystem/MkfsParams` - string      Additional parameters for the mkfs command  - `StorDriver/LvcreateType` - enum     * linear     * striped     * mirror     * raid0     * raid1     * raid4     * raid5     * raid6     * raid10     * lzma     * lz4  - `StorDriver/LvcreateOptions` - regex[`.*`]      Additional parameters added to every 'lvcreate ... ' command  - `StorDriver/ZfscreateOptions` - regex[`.*`]      Additional parameters added to every 'zfs create ... ' command  - `DrbdCurrentGi` - regex[`[a-fA-F0-9]{16}`]      Initial DRBD generation id, if initial sync is skipped, this ID will be set  - `sys/fs/blkio_throttle_read` - long      Sets the /sys/fs/cgroup/blkio/blkio.throttle.read_bps_device  - `sys/fs/blkio_throttle_write` - long      Sets the /sys/fs/cgroup/blkio/blkio.throttle.write_bps_device  - `sys/fs/blkio_throttle_read_iops` - long      Sets the /sys/fs/cgroup/blkio/blkio.throttle.read_iops_device  - `sys/fs/blkio_throttle_write_iops` - long      Sets the /sys/fs/cgroup/blkio/blkio.throttle.write_iops_device  - `Writecache/PoolName` - regex[`^[a-zA-Z0-9_][a-zA-Z0-9_-]{2,47}$`]      Linstor storage pool name for writecache  - `Writecache/Size` - regex[`^100%|[0-9]{1,2}([.][0-9]*)?%|[1-9][0-9]{2,}$`]      Size of the writecache in % (0-100) or KiB otherwise  - `Writecache/Options/StartSector` - long      offset from the start of cache device in 512-byte sectors  - `Writecache/Options/HighWatermark` - long      start writeback when the number of used blocks reach this watermark  - `Writecache/Options/LowWatermark` - long      stop writeback when the number of used blocks drops below this watermark  - `Writecache/Options/WritebackJobs` - long      limit the number of blocks that are in flight during writeback. Setting this value reduces writeback throughput, but it may improve latency of read requests  - `Writecache/Options/AutocommitBlocks` - long      when the application writes this amount of blocks without issuing the FLUSH request, the blocks are automatically commited  - `Writecache/Options/AutocommitTime` - long      autocommit time in milliseconds. The data is automatically commited if this time passes and no FLUSH request is received  - `Writecache/Options/Fua` - enum      \"On\" results in \"fua\" as argument, whereas the value \"Off\" results in \"nofua\" argument      * On     * Off  - `Writecache/Options/Additional` - string      Additional arguments passed through  - `Cache/OpMode` - enum      Operation mode      * writeback     * writethrough     * passthrough  - `Cache/MetaPool` - regex[`^[a-zA-Z0-9_][a-zA-Z0-9_-]{2,47}$`]      Name of the storage pool used for the cache metadata. If not specified, this will default to the CachePool property  - `Cache/Metasize` - regex[`^100%|[0-9]{1,2}([.][0-9]*)?%|[1-9][0-9]{2,}$`]      Size of the cache in % (0-100) or KiB otherwise.  - `Cache/CachePool` - regex[`^[a-zA-Z0-9_][a-zA-Z0-9_-]{2,47}$`]      Name of the storage pool used for the cache cache device  - `Cache/Cachesize` - regex[`^100%|[0-9]{1,2}([.][0-9]*)?%|[1-9][0-9]{2,}$`]      Size of the cache in % (0-100) or KiB otherwise.  - `Cache/Blocksize` - long      Block size  - `Cache/Policy` - enum      Replacemant policy      * mq     * smq     * cleaner  - `DrbdOptions/Disk/on-io-error` - enum     * pass_on     * call-local-io-error     * detach  - `DrbdOptions/Disk/disk-barrier` - boolean - `DrbdOptions/Disk/disk-flushes` - boolean - `DrbdOptions/Disk/disk-drain` - boolean - `DrbdOptions/Disk/md-flushes` - boolean - `DrbdOptions/Disk/resync-after` - string - `DrbdOptions/Disk/al-extents` - range[`67-65534`] - `DrbdOptions/Disk/al-updates` - boolean - `DrbdOptions/Disk/discard-zeroes-if-aligned` - boolean - `DrbdOptions/Disk/disable-write-same` - boolean - `DrbdOptions/Disk/disk-timeout` - range[`0-6000`] - `DrbdOptions/Disk/read-balancing` - enum     * prefer-local     * prefer-remote     * round-robin     * least-pending     * when-congested-remote     * 32K-striping     * 64K-striping     * 128K-striping     * 256K-striping     * 512K-striping     * 1M-striping  - `DrbdOptions/Disk/rs-discard-granularity` - range[`0-1048576`] 
     # @param resource [String] resource to use
     # @param volume_number [Integer] 
     # @param [Hash] opts the optional parameters
@@ -5412,7 +6232,7 @@ module LinstorClient
     end
 
     # modify a volume-definition
-    # Sets or modifies properties  Possible properties are: - &#x60;StorPoolName&#x60; - regex[&#x60;^[a-zA-Z0-9_][a-zA-Z0-9_-]{2,47}$&#x60;]      Linstor storage pool name to use.  - &#x60;StorPoolNameDrbdMeta&#x60; - regex[&#x60;^|.internal|[a-zA-Z0-9_][a-zA-Z0-9_-]{2,47}$&#x60;]      Linstor storage pool name to use.  - &#x60;DrbdMetaType&#x60; - enum     * external     * internal  - &#x60;OverrideVlmId&#x60; - regex[&#x60;.*&#x60;]      Overwrites the generated &#39;&lt;resource-name&gt;_&lt;5 digit volume number&gt;&#39; volume name for migration purposes  - &#x60;AllowLargerVolumeSize&#x60; - boolean_true_false      Do not fail when the underlying volume is larger than expected  - &#x60;FileSystem/Type&#x60; - enum      File system type to use      * ext4     * xfs  - &#x60;FileSystem/MkfsParams&#x60; - string      Additional parameters for the mkfs command  - &#x60;StorDriver/LvcreateType&#x60; - enum     * linear     * striped     * mirror     * raid0     * raid1     * raid4     * raid5     * raid6     * raid10     * lzma     * lz4  - &#x60;DrbdCurrentGi&#x60; - regex[&#x60;[a-fA-F0-9]{16}&#x60;] - &#x60;sys/fs/blkio_throttle_read&#x60; - long      Sets the /sys/fs/cgroup/blkio/blkio.throttle.read_bps_device  - &#x60;sys/fs/blkio_throttle_write&#x60; - long      Sets the /sys/fs/cgroup/blkio/blkio.throttle.write_bps_device  - &#x60;Writecache/PoolName&#x60; - regex[&#x60;^[a-zA-Z0-9_][a-zA-Z0-9_-]{2,47}$&#x60;]      Linstor storage pool name for writecache  - &#x60;Writecache/Size&#x60; - regex[&#x60;^100%|[0-9]{1,2}([.][0-9]*)?%|[1-9][0-9]{2,}$&#x60;]      Size of the writecache in % (0-100) or KiB otherwise  - &#x60;Writecache/Blocksize&#x60; - long      4096 is recommended; the maximum block size is the page size  - &#x60;Writecache/Options/StartSector&#x60; - long      offset from the start of cache device in 512-byte sectors  - &#x60;Writecache/Options/HighWatermark&#x60; - long      start writeback when the number of used blocks reach this watermark  - &#x60;Writecache/Options/LowWatermark&#x60; - long      stop writeback when the number of used blocks drops below this watermark  - &#x60;Writecache/Options/WritebackJobs&#x60; - long      limit the number of blocks that are in flight during writeback. Setting this value reduces writeback throughput, but it may improve latency of read requests  - &#x60;Writecache/Options/AutocommitBlocks&#x60; - long      when the application writes this amount of blocks without issuing the FLUSH request, the blocks are automatically commited  - &#x60;Writecache/Options/AutocommitTime&#x60; - long      autocommit time in milliseconds. The data is automatically commited if this time passes and no FLUSH request is received  - &#x60;Writecache/Options/Fua&#x60; - enum      \&quot;On\&quot; results in \&quot;fua\&quot; as argument, whereas the value \&quot;Off\&quot; results in \&quot;nofua\&quot; argument      * On     * Off  - &#x60;Writecache/Options/Additional&#x60; - string      Additional arguments passed through  - &#x60;DrbdOptions/Disk/read-balancing&#x60; - enum     * prefer-local     * prefer-remote     * round-robin     * least-pending     * when-congested-remote     * 32K-striping     * 64K-striping     * 128K-striping     * 256K-striping     * 512K-striping     * 1M-striping  - &#x60;DrbdOptions/Disk/on-io-error&#x60; - enum     * pass_on     * call-local-io-error     * detach  - &#x60;DrbdOptions/Disk/disk-drain&#x60; - boolean - &#x60;DrbdOptions/Disk/resync-after&#x60; - string - &#x60;DrbdOptions/Disk/disk-timeout&#x60; - range[&#x60;0-6000&#x60;] - &#x60;DrbdOptions/Disk/disable-write-same&#x60; - boolean - &#x60;DrbdOptions/Disk/rs-discard-granularity&#x60; - range[&#x60;0-1048576&#x60;] - &#x60;DrbdOptions/Disk/disk-flushes&#x60; - boolean - &#x60;DrbdOptions/Disk/al-extents&#x60; - range[&#x60;67-65534&#x60;] - &#x60;DrbdOptions/Disk/al-updates&#x60; - boolean - &#x60;DrbdOptions/Disk/md-flushes&#x60; - boolean - &#x60;DrbdOptions/Disk/disk-barrier&#x60; - boolean - &#x60;DrbdOptions/Disk/discard-zeroes-if-aligned&#x60; - boolean 
+    # Sets or modifies properties  Possible properties are: - &#x60;StorPoolName&#x60; - regex[&#x60;^[a-zA-Z0-9_][a-zA-Z0-9_-]{2,47}$&#x60;]      Linstor storage pool name to use.  - &#x60;StorPoolNameDrbdMeta&#x60; - regex[&#x60;^|.internal|[a-zA-Z0-9_][a-zA-Z0-9_-]{2,47}$&#x60;]      Linstor storage pool name to use for external metadata.  - &#x60;OverrideVlmId&#x60; - regex[&#x60;.*&#x60;]      Overwrites the generated &#39;&lt;resource-name&gt;_&lt;5 digit volume number&gt;&#39; volume name for migration purposes  - &#x60;FileSystem/Type&#x60; - enum      File system type to use      * ext4     * xfs  - &#x60;FileSystem/MkfsParams&#x60; - string      Additional parameters for the mkfs command  - &#x60;StorDriver/LvcreateType&#x60; - enum     * linear     * striped     * mirror     * raid0     * raid1     * raid4     * raid5     * raid6     * raid10     * lzma     * lz4  - &#x60;StorDriver/LvcreateOptions&#x60; - regex[&#x60;.*&#x60;]      Additional parameters added to every &#39;lvcreate ... &#39; command  - &#x60;StorDriver/ZfscreateOptions&#x60; - regex[&#x60;.*&#x60;]      Additional parameters added to every &#39;zfs create ... &#39; command  - &#x60;DrbdCurrentGi&#x60; - regex[&#x60;[a-fA-F0-9]{16}&#x60;]      Initial DRBD generation id, if initial sync is skipped, this ID will be set  - &#x60;sys/fs/blkio_throttle_read&#x60; - long      Sets the /sys/fs/cgroup/blkio/blkio.throttle.read_bps_device  - &#x60;sys/fs/blkio_throttle_write&#x60; - long      Sets the /sys/fs/cgroup/blkio/blkio.throttle.write_bps_device  - &#x60;sys/fs/blkio_throttle_read_iops&#x60; - long      Sets the /sys/fs/cgroup/blkio/blkio.throttle.read_iops_device  - &#x60;sys/fs/blkio_throttle_write_iops&#x60; - long      Sets the /sys/fs/cgroup/blkio/blkio.throttle.write_iops_device  - &#x60;Writecache/PoolName&#x60; - regex[&#x60;^[a-zA-Z0-9_][a-zA-Z0-9_-]{2,47}$&#x60;]      Linstor storage pool name for writecache  - &#x60;Writecache/Size&#x60; - regex[&#x60;^100%|[0-9]{1,2}([.][0-9]*)?%|[1-9][0-9]{2,}$&#x60;]      Size of the writecache in % (0-100) or KiB otherwise  - &#x60;Writecache/Options/StartSector&#x60; - long      offset from the start of cache device in 512-byte sectors  - &#x60;Writecache/Options/HighWatermark&#x60; - long      start writeback when the number of used blocks reach this watermark  - &#x60;Writecache/Options/LowWatermark&#x60; - long      stop writeback when the number of used blocks drops below this watermark  - &#x60;Writecache/Options/WritebackJobs&#x60; - long      limit the number of blocks that are in flight during writeback. Setting this value reduces writeback throughput, but it may improve latency of read requests  - &#x60;Writecache/Options/AutocommitBlocks&#x60; - long      when the application writes this amount of blocks without issuing the FLUSH request, the blocks are automatically commited  - &#x60;Writecache/Options/AutocommitTime&#x60; - long      autocommit time in milliseconds. The data is automatically commited if this time passes and no FLUSH request is received  - &#x60;Writecache/Options/Fua&#x60; - enum      \&quot;On\&quot; results in \&quot;fua\&quot; as argument, whereas the value \&quot;Off\&quot; results in \&quot;nofua\&quot; argument      * On     * Off  - &#x60;Writecache/Options/Additional&#x60; - string      Additional arguments passed through  - &#x60;Cache/OpMode&#x60; - enum      Operation mode      * writeback     * writethrough     * passthrough  - &#x60;Cache/MetaPool&#x60; - regex[&#x60;^[a-zA-Z0-9_][a-zA-Z0-9_-]{2,47}$&#x60;]      Name of the storage pool used for the cache metadata. If not specified, this will default to the CachePool property  - &#x60;Cache/Metasize&#x60; - regex[&#x60;^100%|[0-9]{1,2}([.][0-9]*)?%|[1-9][0-9]{2,}$&#x60;]      Size of the cache in % (0-100) or KiB otherwise.  - &#x60;Cache/CachePool&#x60; - regex[&#x60;^[a-zA-Z0-9_][a-zA-Z0-9_-]{2,47}$&#x60;]      Name of the storage pool used for the cache cache device  - &#x60;Cache/Cachesize&#x60; - regex[&#x60;^100%|[0-9]{1,2}([.][0-9]*)?%|[1-9][0-9]{2,}$&#x60;]      Size of the cache in % (0-100) or KiB otherwise.  - &#x60;Cache/Blocksize&#x60; - long      Block size  - &#x60;Cache/Policy&#x60; - enum      Replacemant policy      * mq     * smq     * cleaner  - &#x60;DrbdOptions/Disk/on-io-error&#x60; - enum     * pass_on     * call-local-io-error     * detach  - &#x60;DrbdOptions/Disk/disk-barrier&#x60; - boolean - &#x60;DrbdOptions/Disk/disk-flushes&#x60; - boolean - &#x60;DrbdOptions/Disk/disk-drain&#x60; - boolean - &#x60;DrbdOptions/Disk/md-flushes&#x60; - boolean - &#x60;DrbdOptions/Disk/resync-after&#x60; - string - &#x60;DrbdOptions/Disk/al-extents&#x60; - range[&#x60;67-65534&#x60;] - &#x60;DrbdOptions/Disk/al-updates&#x60; - boolean - &#x60;DrbdOptions/Disk/discard-zeroes-if-aligned&#x60; - boolean - &#x60;DrbdOptions/Disk/disable-write-same&#x60; - boolean - &#x60;DrbdOptions/Disk/disk-timeout&#x60; - range[&#x60;0-6000&#x60;] - &#x60;DrbdOptions/Disk/read-balancing&#x60; - enum     * prefer-local     * prefer-remote     * round-robin     * least-pending     * when-congested-remote     * 32K-striping     * 64K-striping     * 128K-striping     * 256K-striping     * 512K-striping     * 1M-striping  - &#x60;DrbdOptions/Disk/rs-discard-granularity&#x60; - range[&#x60;0-1048576&#x60;] 
     # @param resource [String] resource to use
     # @param volume_number [Integer] 
     # @param [Hash] opts the optional parameters

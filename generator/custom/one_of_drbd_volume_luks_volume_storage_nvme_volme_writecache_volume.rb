@@ -1,5 +1,5 @@
 module LinstorClient
-  class OneOfDrbdVolumeLUKSVolumeStorageVolumeNVMEVolumeWritecacheVolume
+  class OneOfDrbdVolumeLUKSVolumeStorageVolumeNVMEVolumeWritecacheVolumeCacheVolume
     def self.build_from_hash(attributes)
       if attributes.key?(:drbd_volume_definition)
         DrbdVolume.build_from_hash(attributes)

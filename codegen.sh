@@ -3,7 +3,7 @@
 VERSION="v5.3.1"
 
 docker run -i --rm -v $(pwd):/work -w /work --entrypoint /bin/bash openapitools/openapi-generator-cli:$VERSION <<__EOS__
-curl -s https://raw.githubusercontent.com/LINBIT/linstor-server/v1.4.2/docs/rest_v1_openapi.yaml |
+curl -s https://raw.githubusercontent.com/LINBIT/linstor-server/v1.10.0/docs/rest_v1_openapi.yaml |
 sed -e 's/- Controller/- CONTROLLER/g' \
     -e 's/- Satellite/- SATELLITE/g' \
     -e 's/- Combined/- COMBINED/g' \
