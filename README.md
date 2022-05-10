@@ -11,11 +11,11 @@ LinstorClient.configure do |c|
   c.host = "203.0.113.25:3370"
 end
 
-client = LinstorClient::DevelopersApi.ne
+client = LinstorClient::DevelopersApi.new
 clinet.view_resources
 ```
 
-## Supported Linstor API version
+## Supported Linstor REST API version
 
-* 1.0.13
-* https://app.swaggerhub.com/apis-docs/Linstor/Linstor/1.0.13#/developers/viewResources
+* 1.5.0
+* https://app.swaggerhub.com/apis-docs/Linstor/Linstor/1.5.0
