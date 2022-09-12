@@ -12,7 +12,7 @@ LinstorClient.configure do |c|
 end
 
 client = LinstorClient::DevelopersApi.new
-clinet.view_resources
+client.view_resources
 ```
 
 ## Supported Linstor REST API version
