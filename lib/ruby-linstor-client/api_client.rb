@@ -16,6 +16,7 @@ require 'logger'
 require 'tempfile'
 require 'time'
 require 'faraday'
+require 'ostruct'
 
 module LinstorClient
   class ApiClient
