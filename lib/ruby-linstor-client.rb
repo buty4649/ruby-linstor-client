@@ -107,8 +107,10 @@ require 'ruby-linstor-client/models/volume_modify'
 require 'ruby-linstor-client/models/volume_state'
 require 'ruby-linstor-client/models/writecache_resource'
 require 'ruby-linstor-client/models/writecache_volume'
+require 'ruby-linstor-client/models/one_of_drbd_resource_definition_layer_open_flex_resource_definition_layer'
 require 'ruby-linstor-client/models/one_of_drbd_resource_definition_layer'
 require 'ruby-linstor-client/models/one_of_drbd_volume_definition'
+require 'ruby-linstor-client/models/one_of_drbd_volume_luks_volume_storage_nvme_volme_writecache_volume_cache_volume'
 require 'ruby-linstor-client/models/one_of_drbd_volume_luks_volume_storage_nvme_volme_writecache_volume'
 
 # APIs
